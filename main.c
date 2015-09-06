@@ -10,7 +10,7 @@ int verificaPlacar(char *placar);
 int verificaVencedor(char *nomeWinner, char *nomeAzul, char *nomeVermelho, char *placarAzul, char *placarVerm);
 
 int main(){
-	FILE *indicePrimario, *indiceSecundario;
+	FILE *indicePrimario, *matches;
 	FILE *indiceVencedor, *indiceMVP;
 	char *nomeVermelho, *nomeAzul, *nomeWinner;
 	char placarAzul[2], placarVerm[2], *apelidoMVP;
@@ -25,6 +25,7 @@ int main(){
 	indicePrimario = fopen("iprimary.idx", "a+");
 	indiceVencedor = fopen("iwinner.idx", "a+");
 	indiceMVP = fopen("imvp.idx", "a+");
+	matches = fopen("matches.dat", "a+");
 	
 	
 	while(1){
