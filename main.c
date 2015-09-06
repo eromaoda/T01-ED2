@@ -8,6 +8,7 @@ int verificaData(char *data);
 int verificaDuracao(char *duracao);
 int verificaPlacar(char *placar);
 int verificaVencedor(char *nomeWinner, char *nomeAzul, char *nomeVermelho, char *placarAzul, char *placarVerm);
+void adicionaDados(FILE *f, char *nomeAzul, char *nomeVerm, char *nomeWinner, char *plAz, char *plVe, char *data, char *dur, char *mvp);
 
 int main(){
 	FILE *indicePrimario, *matches;
@@ -139,7 +140,7 @@ int main(){
 //Funcao que imprime o menu principal
 void printMenu(){
 	printf("1. Inserir nova partida\n2. Remover partida a partir da chave primaria\n3. Modificar duracao\n4. Buscar partidas\n");
-	printf("5. Listar partidas\n6. Liberar espaco\n");
+	printf("5. Listar partidas\n6. Liberar espaco\n7. Finalizar\n");
 }
 
 //Verifica se uma data eh valida,
@@ -204,4 +205,29 @@ int verificaVencedor(char *nomeWinner, char *nomeAzul, char *nomeVermelho, char 
 	
 	free(aux);
 	return 0;
+}
+
+//Adiciona os dados da partida recem informada no arquivo de dados matches.dat
+void adicionaDados(FILE *f, char *nomeAzul, char *nomeVerm, char *nomeWinner, char *plAz, char *plVe, char *data, char *dur, char *mvp){
+	char cod[8], aux[MAX];
+	int i;
+	
+	//Montando o codigo identificador da partida
+	cod[0] = toupper(nomeAzul[0]);
+	cod[1] = toupper(nomeVerm[0]);
+	cod[2] = toupper(mvp[0]);
+	cod[3] = toupper(mvp[1]);
+	cod[4] = data[0];
+	cod[5] = data[1];
+	cod[6] = data[3];
+	cod[7] = data[4];
+	cod[8] = '\0';
+	
+	//Passando os valores formatados para uma srting auxiliar,
+	//e a imprimindo no arquivo
+	sprintf(aux, "%s@%s@%s@%s@%s@%s@%s@%s@%s@", cod, nomeAzul, nomeVerm, data, dur, nomeWinner, plAz, plVe, mvp);
+	fprintf(f, "%s", aux);
+	
+	//Comletando com #'s
+	for(i = 0; i < (192 - strlen(aux)); i++) fprintf(f, "#");
 }
