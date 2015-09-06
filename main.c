@@ -22,6 +22,10 @@ int main(){
 	if(nomeAzul == NULL) exit(1);
 	
 	//ainda tem q abrir os arquivos e mais um monte de coisa ...
+	indicePrimario = fopen("iprimary.idx", "a+");
+	indiceVencedor = fopen("iwinner.idx", "a+");
+	indiceMVP = fopen("imvp.idx", "a+");
+	
 	
 	while(1){
 		printMenu();
@@ -117,6 +121,9 @@ int main(){
 				break;
 			//Libera espaco
 			case 6: 
+				break;
+			//Finaliza execucao
+			case 7:
 				break;
 			default:
 				break;
