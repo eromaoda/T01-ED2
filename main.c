@@ -3,12 +3,33 @@
 #include<string.h>
 #define MAX 192
 
+typedef struct reg{
+	char *nomeAzul;
+	char *nomeVermelho;
+	char *data;
+	char *duracao;
+	char *placarAzul;
+	char *placarVermelho;
+	char *apelidoMVP;
+	char *nomeWinner;
+	char *chavePrimaria;
+} Registro;
+
 void printMenu();
 int verificaData(char *data);
 int verificaDuracao(char *duracao);
 int verificaPlacar(char *placar);
 int verificaVencedor(char *nomeWinner, char *nomeAzul, char *nomeVermelho, char *placarAzul, char *placarVerm);
 void adicionaDados(FILE *f, char *nomeAzul, char *nomeVerm, char *nomeWinner, char *plAz, char *plVe, char *data, char *dur, char *mvp);
+char *geraChave(char *nomeAzul, char *nomeVerm, char *nomeWinner, char *plAz, char *plVe, char *data, char *dur, char *mvp);
+void removerRegistro(Registro r);
+void ordenaVetor(Registro *vet, int k);
+Registro buscaRegistro(char *chave);
+void atualizar();
+void listaRegistros(char *parametro, Registro *vet, int k, int op);
+void povoaArquivo(Registro *vet, FILE *f);
+int compara(const void *a, const void *b);
+int estaVazio(FILE *f);
 
 int main(){
 	FILE *indicePrimario, *matches;
@@ -16,7 +37,9 @@ int main(){
 	char *nomeVermelho, *nomeAzul, *nomeWinner;
 	char placarAzul[2], placarVerm[2], *apelidoMVP;
 	char data[10], chavePrim[8], duracao[5], lixo;
-	int opcao, tamTotal = MAX, op2;
+	char buscaParam[MAX];
+	int opcao, tamTotal = MAX, op2, i;
+	Registro *vetor;
 	
 	tamTotal -= 10 + 2 + 2 + 8 + 5;
 	nomeAzul = malloc(sizeof(char) * tamTotal + 1);
@@ -99,7 +122,7 @@ int main(){
 				//scanf("%[^\n]", apelidoMVP);
 				tamTotal -= strlen(nomeWinner);
 				fgets(apelidoMVP, tamTotal, stdin);
-
+				
 				break;
 			//Remove partida
 			case 2:
@@ -114,12 +137,37 @@ int main(){
 				printf("1) Chave Primaria\n2) Nome da equipe vencedora\n3) Apelido do MVP\n");
 				scanf("%d", &op2);
 				//Decide o tipo de busca para cada uma das opcoes
-				
+				if(op2 == 1){
+					//Busca por chave primaria
+					//fgets(buscaParam)
+				}else if(op2 == 2){
+					//Busca por nome da equipe vencedora (chave secundaria)
+					
+				}else if(op2 == 3){
+					//Busca por apelido do MVP (chave secundaria)
+				} 
 				break;
 			//Lista partidas
 			case 5:
 				printf("1) Codigo\n2) Nome da equipe vencedora\n3) Apelido do MVP\n");
 				scanf("%d", &op2);
+				if(op2 == 1){
+					//Listagem por codigo (chave primaria)
+					if(estaVazio(matches) == 0){
+						//qsort(vetor.chavePrimaria, k, sizeof(char), compara);
+						int k = sizeof(vetor) / sizeof(Registro);
+						for(i = 0; i < k; i++){
+							if(vetor[i].chavePrimaria[0] != '*' && vetor[i].chavePrimaria[1] != '|')
+								printf("%s\n%s\n", vetor[i].nomeAzul, vetor[i].nomeVermelho);
+						}
+					}
+				}else if(op2 == 2){
+					//Listagem por nome da equipe vencedora (chave secundaria)
+					
+				}else if(op2 == 3){
+					//Listagem por apelido do MVP (chave secundaria)
+					
+				}
 				break;
 			//Libera espaco
 			case 6: 
@@ -207,6 +255,24 @@ int verificaVencedor(char *nomeWinner, char *nomeAzul, char *nomeVermelho, char 
 	return 0;
 }
 
+char *geraChave(char *nomeAzul, char *nomeVerm, char *nomeWinner, char *plAz, char *plVe, char *data, char *dur, char *mvp){
+	char *cod = malloc(sizeof(char) * 8 + 1);
+	if(cod == NULL) exit(1);
+	
+	//Montando o codigo identificador da partida
+	cod[0] = toupper(nomeAzul[0]);
+	cod[1] = toupper(nomeVerm[0]);
+	cod[2] = toupper(mvp[0]);
+	cod[3] = toupper(mvp[1]);
+	cod[4] = data[0];
+	cod[5] = data[1];
+	cod[6] = data[3];
+	cod[7] = data[4];
+	cod[8] = '\0';
+	
+	return cod;
+}
+
 //Adiciona os dados da partida recem informada no arquivo de dados matches.dat
 void adicionaDados(FILE *f, char *nomeAzul, char *nomeVerm, char *nomeWinner, char *plAz, char *plVe, char *data, char *dur, char *mvp){
 	char cod[8], aux[MAX];
@@ -230,4 +296,43 @@ void adicionaDados(FILE *f, char *nomeAzul, char *nomeVerm, char *nomeWinner, ch
 	
 	//Comletando com #'s
 	for(i = 0; i < (192 - strlen(aux)); i++) fprintf(f, "#");
+}
+
+int compara(const void *a, const void *b){
+	return strcmp(a, b);
+}
+
+void ordenaVetor(Registro *vet, int k){
+	qsort(vet->chavePrimaria, k, sizeof(char), compara);
+}
+
+/*void listaRegistros(char *parametro, Registro *vet, int k, int op){
+	int i;
+	
+	ordenaVetor(vet, k);
+	
+	if(op == 1){
+		for(i = 0; i < k; i++){
+			if(strcmp(vet->))
+		}
+	}else if(op == 2){
+		for(i = 0; i < k; i++){
+		
+		}
+	}else if(op == 3){
+		for(i = 0; i < k; i++){
+		
+		}
+	}
+}*/
+
+int estaVazio(FILE *f){
+	int tam;
+	
+	fseek(f, 0L, SEEK_END);
+	tam = ftell(f);
+	fseek(f, 0L, SEEK_SET);
+	
+	if(tam == 0) return 1;
+	return 0;
 }
