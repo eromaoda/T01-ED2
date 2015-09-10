@@ -24,7 +24,7 @@ void adicionaDados(FILE *f, char *nomeAzul, char *nomeVerm, char *nomeWinner, ch
 char *geraChave(char *nomeAzul, char *nomeVerm, char *nomeWinner, char *plAz, char *plVe, char *data, char *dur, char *mvp);
 void removerRegistro(Registro r);
 void ordenaVetor(Registro *vet, int k);
-Registro buscaRegistro(char *chave);
+int buscaRegistro(char *chave, Registro *vet, Registro *r, int c);
 void atualizar();
 void listaRegistros(char *parametro, Registro *vet, int k, int op);
 void povoaArquivo(Registro *vet, FILE *f);
@@ -36,10 +36,10 @@ int main(){
 	FILE *indiceVencedor, *indiceMVP;
 	char *nomeVermelho, *nomeAzul, *nomeWinner;
 	char placarAzul[2], placarVerm[2], *apelidoMVP;
-	char data[10], chavePrim[8], duracao[5], lixo;
-	char buscaParam[MAX], cont = 0;
+	char data[11], chavePrim[8], duracao[5], lixo;
+	char buscaParam[MAX], cont = 0, modif[5];
 	int opcao, tamTotal = MAX, op2, i;
-	Registro *vetor;
+	Registro *vetor, r;
 	
 	tamTotal -= 10 + 2 + 2 + 8 + 5;
 	nomeAzul = malloc(sizeof(char) * tamTotal + 1);
@@ -75,11 +75,13 @@ int main(){
 				tamTotal -= strlen(nomeVermelho);
 				
 				//Le a data da partida, e verifica se esta correta
-				fgets(data, 10, stdin);
-				data[strlen(data) - 1] = '\0';
+				fgets(data, 11, stdin);
+				//data[strlen(data) - 1] = '\0';
+				printf("DATA = %s\n", data);
 				while(verificaData(data) != 1){
 					printf("Campo invalido ! Tente novamente: ");
-					scanf("%s", data);
+					fgets(data, 10, stdin);
+					data[strlen(data) - 1] = '\0';
 				}
 
 				//Le a duracao da partida, e verifica se possui 5 bytes
@@ -125,6 +127,9 @@ int main(){
 				tamTotal -= strlen(nomeWinner);
 				fgets(apelidoMVP, tamTotal, stdin);
 				
+				//Passa os valores informados ao vetor de registros
+				//Se for o primeiro registro, nao precisa realocar
+				//Mas se algum registro ja foi inserido, usa realloc
 				if(cont == 0){
 					strcpy(vetor[cont].nomeAzul, nomeAzul);
 					strcpy(vetor[cont].nomeVermelho, nomeVermelho);
@@ -148,7 +153,10 @@ int main(){
 					strcpy(vetor[cont].placarVermelho, placarVerm);
 					strcpy(vetor[cont].apelidoMVP, apelidoMVP);
 					strcpy(vetor[cont].chavePrimaria, geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
+					
+					cont++;
 				}
+				printf("CHAVE = %s\n", geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
 				break;
 			//Remove partida
 			case 2:
@@ -157,6 +165,15 @@ int main(){
 			//Modifica duracao
 			case 3:
 				scanf("%s", chavePrim);
+				printf("%s\n", chavePrim);
+				if(buscaRegistro(chavePrim, vetor, &r, cont) == 1){
+					scanf("%s", modif);
+					while(verificaDuracao(duracao) != 1){
+						printf("Campo invalido ! Tente novamente: ");
+						scanf("%s", modif);
+					}
+					strcpy(r.duracao, modif);
+				}else printf("Registro nao encontrado !\n");
 				break;
 			//Busca partida
 			case 4: 
@@ -361,4 +378,17 @@ int estaVazio(FILE *f){
 	
 	if(tam == 0) return 1;
 	return 0;
+}
+
+int buscaRegistro(char *chave, Registro *vet, Registro *r, int c){
+	int i, flag = 0;
+	//printf("sizeof vet[0] = %d\n", sizeof(vet));
+	for(i = 0; i < c; i++){
+		if(strcmp(vet[i].chavePrimaria, chave) == 0){
+			flag = 1;
+			r = &vet[i];
+		}
+	}
+	
+	return flag;
 }
