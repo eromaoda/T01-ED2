@@ -4,15 +4,15 @@
 #define MAX 192
 
 typedef struct reg{
-	char *nomeAzul;
-	char *nomeVermelho;
-	char *data;
-	char *duracao;
-	char *placarAzul;
-	char *placarVermelho;
-	char *apelidoMVP;
-	char *nomeWinner;
-	char *chavePrimaria;
+	char nomeAzul[39];
+	char nomeVermelho[39];
+	char data[10];
+	char duracao[5];
+	char placarAzul[2];
+	char placarVermelho[2];
+	char apelidoMVP[39];
+	char nomeWinner[39];
+	char chavePrimaria[8];
 } Registro;
 
 void printMenu();
@@ -37,7 +37,7 @@ int main(){
 	char *nomeVermelho, *nomeAzul, *nomeWinner;
 	char placarAzul[2], placarVerm[2], *apelidoMVP;
 	char data[10], chavePrim[8], duracao[5], lixo;
-	char buscaParam[MAX];
+	char buscaParam[MAX], cont = 0;
 	int opcao, tamTotal = MAX, op2, i;
 	Registro *vetor;
 	
@@ -51,6 +51,8 @@ int main(){
 	indiceMVP = fopen("imvp.idx", "a+");
 	matches = fopen("matches.dat", "a+");
 	
+	vetor = malloc(sizeof(int) * 1);
+	if(vetor == NULL) exit(1);
 	
 	while(1){
 		printMenu();
@@ -123,6 +125,30 @@ int main(){
 				tamTotal -= strlen(nomeWinner);
 				fgets(apelidoMVP, tamTotal, stdin);
 				
+				if(cont == 0){
+					strcpy(vetor[cont].nomeAzul, nomeAzul);
+					strcpy(vetor[cont].nomeVermelho, nomeVermelho);
+					strcpy(vetor[cont].data, data);
+					strcpy(vetor[cont].duracao, duracao);
+					strcpy(vetor[cont].nomeWinner, nomeWinner);
+					strcpy(vetor[cont].placarAzul, placarAzul);
+					strcpy(vetor[cont].placarVermelho, placarVerm);
+					strcpy(vetor[cont].apelidoMVP, apelidoMVP);
+					strcpy(vetor[cont].chavePrimaria, geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
+					
+					cont++;
+				}else if(cont > 0){
+					char *temp = realloc(vetor, sizeof(Registro) * cont);
+					strcpy(vetor[cont].nomeAzul, nomeAzul);
+					strcpy(vetor[cont].nomeVermelho, nomeVermelho);
+					strcpy(vetor[cont].data, data);
+					strcpy(vetor[cont].duracao, duracao);
+					strcpy(vetor[cont].nomeWinner, nomeWinner);
+					strcpy(vetor[cont].placarAzul, placarAzul);
+					strcpy(vetor[cont].placarVermelho, placarVerm);
+					strcpy(vetor[cont].apelidoMVP, apelidoMVP);
+					strcpy(vetor[cont].chavePrimaria, geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
+				}
 				break;
 			//Remove partida
 			case 2:
