@@ -77,12 +77,12 @@ int main(){
 				
 				//Le a data da partida, e verifica se esta correta
 				fgets(data, 11, stdin);
-				//data[strlen(data) - 1] = '\0';
+				data[strlen(data)] = '\0';
 				printf("DATA = %s\n", data);
 				while(verificaData(data) != 1){
 					printf("Campo invalido ! Tente novamente: ");
 					fgets(data, 10, stdin);
-					data[strlen(data) - 1] = '\0';
+					data[strlen(data)] = '\0';
 				}
 
 				//Le a duracao da partida, e verifica se possui 5 bytes
@@ -92,42 +92,47 @@ int main(){
 					scanf("%s", duracao);
 				}
 
+				printf("DATA = %s\n", data);
 				//Le o nome da equipe vencedora
 				nomeWinner = malloc(sizeof(char) * tamTotal + 1);
 				if(nomeWinner == NULL) exit(1);
 				getchar();
 				fgets(nomeWinner, tamTotal, stdin);
 				nomeWinner[strlen(nomeWinner) - 1] = '\0';
-				
+
 				//Le o placar da equipe azul, seguido pelo do vermelho, sempre verificando sua validade
 				scanf("%s", placarAzul);
+				placarAzul[strlen(placarAzul)] = '\0';
 				while(verificaPlacar(placarAzul) != 1){
 					printf("Campo invalido ! Informe novamente: ");
 					scanf("%s", placarAzul);
+					placarAzul[strlen(placarAzul)] = '\0';
 				}
-				
+
 				scanf("%s", placarVerm);
 				while(verificaPlacar(placarAzul) != 1){
 					printf("Campo invalido ! Informe novamente: ");
 					scanf("%s", placarVerm);
 				}
-				
+				printf("DATA = %s\n", data);
+
 				getchar();
-				
+
 				//Verifica se o vencedor informado eh o vencedor real
+				printf("DATA = %s\n", data);
 				while(verificaVencedor(nomeWinner, nomeAzul, nomeVermelho, placarAzul, placarVerm) != 1){
 					printf("Campo invalido ! Informe novamente: ");
 					fgets(nomeWinner, tamTotal, stdin);
 					nomeWinner[strlen(nomeWinner) - 1] = '\0';
 				}
-				
+
 				//Le o apelido do MVP
 				apelidoMVP = malloc(sizeof(char) * (tamTotal - strlen(nomeWinner)) + 1);
 				if(apelidoMVP == NULL) exit(1);
 				//scanf("%[^\n]", apelidoMVP);
 				tamTotal -= strlen(nomeWinner);
 				fgets(apelidoMVP, tamTotal, stdin);
-				
+				printf("DATA1 = %s\n", data);
 				//Passa os valores informados ao vetor de registros
 				//Se for o primeiro registro, nao precisa realocar
 				//Mas se algum registro ja foi inserido, usa realloc
@@ -141,8 +146,6 @@ int main(){
 					strcpy(vetor[cont].placarVermelho, placarVerm);
 					strcpy(vetor[cont].apelidoMVP, apelidoMVP);
 					strcpy(vetor[cont].chavePrimaria, geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
-					
-					cont++;
 				}else if(cont > 0){
 					char *temp = realloc(vetor, sizeof(Registro) * cont);
 					strcpy(vetor[cont].nomeAzul, nomeAzul);
@@ -154,10 +157,11 @@ int main(){
 					strcpy(vetor[cont].placarVermelho, placarVerm);
 					strcpy(vetor[cont].apelidoMVP, apelidoMVP);
 					strcpy(vetor[cont].chavePrimaria, geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
-					
-					cont++;
 				}
+				cont++;
 				printf("CHAVE = %s\n", geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
+				//printRegistro(vetor[cont - 1]);
+				printf("%s\n", vetor[cont - 1].data);
 				break;
 			//Remove partida
 			case 2:
@@ -199,7 +203,7 @@ int main(){
 				//fgets(buscaParam, MAX, stdin);
 				scanf("%[^\n]", buscaParam);
 				//buscaParam[strlen(buscaParam)] = '\0';
-				printf("PARAMETRO = %s TAM = %d\n", buscaParam, strlen(buscaParam));
+				//printf("PARAMETRO = %s TAM = %d\n", buscaParam, strlen(buscaParam));
 				if(estaVazio(matches) != 0) listaRegistros(buscaParam, vetor, cont, op2);
 				//Se o arquivo de partidas estiver vazio
 				else{
@@ -211,6 +215,7 @@ int main(){
 				break;
 			//Finaliza execucao
 			case 7:
+				return 0;
 				break;
 			default:
 				break;
@@ -376,7 +381,7 @@ void listaRegistros(char *parametro, Registro *vet, int k, int op){
 	//ordenaVetor(vet, k);
 	
 	if(op == 1){
-		qsort(vet, k, sizeof(char), compara1);
+		//qsort(vet, k, sizeof(char), compara1);
 		for(i = 0; i < k; i++){
 			if(strcmp(vet->chavePrimaria, parametro) == 0){ 
 				flag = 1;
