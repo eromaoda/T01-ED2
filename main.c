@@ -30,6 +30,7 @@ void listaRegistros(char *parametro, Registro *vet, int k, int op);
 void povoaArquivo(Registro *vet, FILE *f);
 int compara(const void *a, const void *b);
 int estaVazio(FILE *f);
+void printRegistro(Registro r);
 
 int main(){
 	FILE *indicePrimario, *matches;
@@ -194,22 +195,15 @@ int main(){
 			case 5:
 				printf("1) Codigo\n2) Nome da equipe vencedora\n3) Apelido do MVP\n");
 				scanf("%d", &op2);
-				if(op2 == 1){
-					//Listagem por codigo (chave primaria)
-					if(estaVazio(matches) == 0){
-						//qsort(vetor.chavePrimaria, k, sizeof(char), compara);
-						int k = sizeof(vetor) / sizeof(Registro);
-						for(i = 0; i < k; i++){
-							if(vetor[i].chavePrimaria[0] != '*' && vetor[i].chavePrimaria[1] != '|')
-								printf("%s\n%s\n", vetor[i].nomeAzul, vetor[i].nomeVermelho);
-						}
-					}
-				}else if(op2 == 2){
-					//Listagem por nome da equipe vencedora (chave secundaria)
-					
-				}else if(op2 == 3){
-					//Listagem por apelido do MVP (chave secundaria)
-					
+				getchar();
+				//fgets(buscaParam, MAX, stdin);
+				scanf("%[^\n]", buscaParam);
+				//buscaParam[strlen(buscaParam)] = '\0';
+				printf("PARAMETRO = %s TAM = %d\n", buscaParam, strlen(buscaParam));
+				if(estaVazio(matches) != 0) listaRegistros(buscaParam, vetor, cont, op2);
+				//Se o arquivo de partidas estiver vazio
+				else{
+					//TODO CODE...
 				}
 				break;
 			//Libera espaco
@@ -341,33 +335,75 @@ void adicionaDados(FILE *f, char *nomeAzul, char *nomeVerm, char *nomeWinner, ch
 	for(i = 0; i < (192 - strlen(aux)); i++) fprintf(f, "#");
 }
 
-int compara(const void *a, const void *b){
-	return strcmp(a, b);
-}
-
-void ordenaVetor(Registro *vet, int k){
-	qsort(vet->chavePrimaria, k, sizeof(char), compara);
-}
-
-/*void listaRegistros(char *parametro, Registro *vet, int k, int op){
-	int i;
+//Funcoes de comparacao para o qsort
+//A primeira ordena pela chave primaria
+int compara1(const void *a, const void *b){
+	Registro *A = (Registro *)a;
+	Registro *B = (Registro *)b;
 	
-	ordenaVetor(vet, k);
+	return strcmp(A->chavePrimaria, B->chavePrimaria);
+}
+
+//A segunda ordena pelo nome da equipe vencedora
+int compara2(const void *a, const void *b){
+	Registro *A = (Registro *)a;
+	Registro *B = (Registro *)b;
+	
+	return strcmp(A->nomeWinner, B->nomeWinner);
+}
+
+//Ja a terceira ordena pelo apelido do MVP
+int compara3(const void *a, const void *b){
+	Registro *A = (Registro *)a;
+	Registro *B = (Registro *)b;
+	
+	return strcmp(A->apelidoMVP, B->apelidoMVP);
+}
+
+/*void ordenaVetor(Registro *vet, int k){
+	qsort(vet->chavePrimaria, k, sizeof(char), compara);
+}*/
+
+void printRegistro(Registro r){
+	printf("%s\n%s\n%s\n", r.nomeAzul, r.nomeVermelho, r.data);
+	printf("%s\n%s\n%s\n", r.duracao, r.nomeWinner, r.placarAzul);
+	printf("%s\n%s\n\n", r.placarVermelho, r.apelidoMVP);
+}
+
+void listaRegistros(char *parametro, Registro *vet, int k, int op){
+	int i, flag = 0;
+	
+	//ordenaVetor(vet, k);
 	
 	if(op == 1){
+		qsort(vet, k, sizeof(char), compara1);
 		for(i = 0; i < k; i++){
-			if(strcmp(vet->))
+			if(strcmp(vet->chavePrimaria, parametro) == 0){ 
+				flag = 1;
+				printRegistro(vet[i]);
+			}
+			if(flag == 0) printf("Nenhum registro encontrado !\n");
 		}
 	}else if(op == 2){
+		qsort(vet, k, sizeof(char), compara2);
 		for(i = 0; i < k; i++){
-		
+			if(strcmp(vet->nomeWinner, parametro) == 0){ 
+					flag = 1;
+					printRegistro(vet[i]);
+			}
+			if(flag == 0) printf("Nenhum registro encontrado !\n");
 		}
 	}else if(op == 3){
+		qsort(vet, k, sizeof(char), compara3);
 		for(i = 0; i < k; i++){
-		
+			if(strcmp(vet->apelidoMVP, parametro) == 0){ 
+				flag = 1;
+				printRegistro(vet[i]);
+			}
+			if(flag == 0) printf("Nenhum registro encontrado !\n");
 		}
 	}
-}*/
+}
 
 int estaVazio(FILE *f){
 	int tam;
