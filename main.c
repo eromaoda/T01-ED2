@@ -65,7 +65,8 @@ int main(){
 				getchar();
 				fgets(nomeAzul, tamTotal, stdin);
 				nomeAzul[strlen(nomeAzul) - 1] = '\0'; //fgets nao remove a quebra de linha da string
-
+				strcpy(vetor[cont].nomeAzul, nomeAzul);
+				
 				//Le o nome da equipe vermelha
 				nomeVermelho = malloc(sizeof(char) * (tamTotal - strlen(nomeAzul)) + 1);
 				if(nomeVermelho == NULL) exit(1);
@@ -74,6 +75,7 @@ int main(){
 				fgets(nomeVermelho, tamTotal, stdin);
 				nomeVermelho[strlen(nomeVermelho) - 1] = '\0';
 				tamTotal -= strlen(nomeVermelho);
+				strcpy(vetor[cont].nomeVermelho, nomeVermelho);
 				
 				//Le a data da partida, e verifica se esta correta
 				fgets(data, 11, stdin);
@@ -84,15 +86,17 @@ int main(){
 					fgets(data, 10, stdin);
 					data[strlen(data)] = '\0';
 				}
+				strcpy(vetor[cont].data, data);
 
 				//Le a duracao da partida, e verifica se possui 5 bytes
-				scanf("%s", duracao);
+				getchar();
+				fgets(duracao, 6, stdin);
 				while(verificaDuracao(duracao) != 1){
 					printf("Campo invalido ! Tente novamente: ");
 					scanf("%s", duracao);
 				}
-
-				printf("DATA = %s\n", data);
+				strcpy(vetor[cont].duracao, duracao);
+				
 				//Le o nome da equipe vencedora
 				nomeWinner = malloc(sizeof(char) * tamTotal + 1);
 				if(nomeWinner == NULL) exit(1);
@@ -108,60 +112,68 @@ int main(){
 					scanf("%s", placarAzul);
 					placarAzul[strlen(placarAzul)] = '\0';
 				}
-
+				strcpy(vetor[cont].placarAzul, placarAzul);
+				
 				scanf("%s", placarVerm);
 				while(verificaPlacar(placarAzul) != 1){
 					printf("Campo invalido ! Informe novamente: ");
 					scanf("%s", placarVerm);
 				}
-				printf("DATA = %s\n", data);
+				strcpy(vetor[cont].placarVermelho, placarVerm);
 
 				getchar();
 
 				//Verifica se o vencedor informado eh o vencedor real
-				printf("DATA = %s\n", data);
 				while(verificaVencedor(nomeWinner, nomeAzul, nomeVermelho, placarAzul, placarVerm) != 1){
 					printf("Campo invalido ! Informe novamente: ");
 					fgets(nomeWinner, tamTotal, stdin);
 					nomeWinner[strlen(nomeWinner) - 1] = '\0';
 				}
-
+				strcpy(vetor[cont].nomeWinner, nomeWinner);
+				
 				//Le o apelido do MVP
 				apelidoMVP = malloc(sizeof(char) * (tamTotal - strlen(nomeWinner)) + 1);
 				if(apelidoMVP == NULL) exit(1);
-				//scanf("%[^\n]", apelidoMVP);
+
 				tamTotal -= strlen(nomeWinner);
 				fgets(apelidoMVP, tamTotal, stdin);
-				printf("DATA1 = %s\n", data);
+				apelidoMVP[strlen(apelidoMVP) - 1] = '\0';
+				strcpy(vetor[cont].apelidoMVP, apelidoMVP);
+
+
 				//Passa os valores informados ao vetor de registros
 				//Se for o primeiro registro, nao precisa realocar
 				//Mas se algum registro ja foi inserido, usa realloc
 				if(cont == 0){
-					strcpy(vetor[cont].nomeAzul, nomeAzul);
-					strcpy(vetor[cont].nomeVermelho, nomeVermelho);
-					strcpy(vetor[cont].data, data);
-					strcpy(vetor[cont].duracao, duracao);
-					strcpy(vetor[cont].nomeWinner, nomeWinner);
-					strcpy(vetor[cont].placarAzul, placarAzul);
-					strcpy(vetor[cont].placarVermelho, placarVerm);
-					strcpy(vetor[cont].apelidoMVP, apelidoMVP);
-					strcpy(vetor[cont].chavePrimaria, geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
+					//__fpurge(stdin);
+					//strcpy(vetor[cont].nomeAzul, nomeAzul);
+					//__fpurge(stdin);
+					//strcpy(vetor[cont].nomeVermelho, nomeVermelho);
+					//__fpurge(stdin);
+					//strcpy(vetor[cont].data, data);
+					//strcpy(vetor[cont].duracao, duracao);
+					//strcpy(vetor[cont].nomeWinner, nomeWinner);
+					//strcpy(vetor[cont].placarAzul, placarAzul);
+					//strcpy(vetor[cont].placarVermelho, placarVerm);
+					//strcpy(vetor[cont].apelidoMVP, apelidoMVP);
+					//strcpy(vetor[cont].chavePrimaria, geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
 				}else if(cont > 0){
 					char *temp = realloc(vetor, sizeof(Registro) * cont);
-					strcpy(vetor[cont].nomeAzul, nomeAzul);
-					strcpy(vetor[cont].nomeVermelho, nomeVermelho);
-					strcpy(vetor[cont].data, data);
-					strcpy(vetor[cont].duracao, duracao);
-					strcpy(vetor[cont].nomeWinner, nomeWinner);
-					strcpy(vetor[cont].placarAzul, placarAzul);
-					strcpy(vetor[cont].placarVermelho, placarVerm);
-					strcpy(vetor[cont].apelidoMVP, apelidoMVP);
-					strcpy(vetor[cont].chavePrimaria, geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
+					//strcpy(vetor[cont].nomeAzul, nomeAzul);
+					//strcpy(vetor[cont].nomeVermelho, nomeVermelho);
+					//strcpy(vetor[cont].data, data);
+					//strcpy(vetor[cont].duracao, duracao);
+					//strcpy(vetor[cont].nomeWinner, nomeWinner);
+					//strcpy(vetor[cont].placarAzul, placarAzul);
+					//strcpy(vetor[cont].placarVermelho, placarVerm);
+					//strcpy(vetor[cont].apelidoMVP, apelidoMVP);
+					//strcpy(vetor[cont].chavePrimaria, geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
 				}
 				cont++;
 				printf("CHAVE = %s\n", geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
 				//printRegistro(vetor[cont - 1]);
-				printf("%s\n", vetor[cont - 1].data);
+				printf("DATA = %s\n", data);
+				//printf("%s\n", vetor[cont - 1].data);
 				break;
 			//Remove partida
 			case 2:
