@@ -35,16 +35,16 @@ void printRegistro(Registro r);
 int main(){
 	FILE *indicePrimario, *matches;
 	FILE *indiceVencedor, *indiceMVP;
-	char *nomeVermelho, *nomeAzul, *nomeWinner;
+	char nomeVermelho[39], nomeAzul[39], nomeWinner[39];
 	char placarAzul[2], placarVerm[2], *apelidoMVP;
 	char data[11], chavePrim[8], duracao[5], lixo;
 	char buscaParam[MAX], cont = 0, modif[5];
 	int opcao, tamTotal = MAX, op2, i;
-	Registro *vetor, r;
+	Registro *vetor, r, *temp;
 	
 	tamTotal -= 10 + 2 + 2 + 8 + 5;
-	nomeAzul = malloc(sizeof(char) * tamTotal + 1);
-	if(nomeAzul == NULL) exit(1);
+	/*nomeAzul = malloc(sizeof(char) * tamTotal + 1);
+	if(nomeAzul == NULL) exit(1);*/
 	
 	//ainda tem q abrir os arquivos e mais um monte de coisa ...
 	indicePrimario = fopen("iprimary.idx", "a+");
@@ -61,119 +61,121 @@ int main(){
 		switch(opcao){
 			//Insere nova partida
 			case 1:
+				//Caso ja exista um registro no vetor de registros
+				if(cont > 0){
+					temp = realloc(vetor, sizeof(Registro) * (cont + 1));
+					if(temp == NULL) exit(1);
+					vetor = temp;
+				}
+				
 				//Le o nome da equipe azul
 				getchar();
-				fgets(nomeAzul, tamTotal, stdin);
-				nomeAzul[strlen(nomeAzul) - 1] = '\0'; //fgets nao remove a quebra de linha da string
-				strcpy(vetor[cont].nomeAzul, nomeAzul);
+				fgets(vetor[cont].nomeAzul, tamTotal, stdin);
+				i = 0;
+				while(vetor[cont].nomeAzul[i] != '\n') i++;
+				vetor[cont].nomeAzul[i] = '\0'; //fgets nao remove a quebra de linha da string
 				
 				//Le o nome da equipe vermelha
-				nomeVermelho = malloc(sizeof(char) * (tamTotal - strlen(nomeAzul)) + 1);
-				if(nomeVermelho == NULL) exit(1);
-				tamTotal -= strlen(nomeAzul);
+				tamTotal -= strlen(vetor[cont].nomeAzul);
+				fgets(vetor[cont].nomeVermelho, tamTotal, stdin);
+				i = 0;
+				while(vetor[cont].nomeVermelho[i] != '\n') i++;	
+				vetor[cont].nomeVermelho[i] = '\0';
+				tamTotal -= strlen(vetor[cont].nomeVermelho);
 
-				fgets(nomeVermelho, tamTotal, stdin);
-				nomeVermelho[strlen(nomeVermelho) - 1] = '\0';
-				tamTotal -= strlen(nomeVermelho);
-				strcpy(vetor[cont].nomeVermelho, nomeVermelho);
-				
 				//Le a data da partida, e verifica se esta correta
 				fgets(data, 11, stdin);
-				data[strlen(data)] = '\0';
+				i = 0;
+				while(data[i] != '\n') i++;
+				data[i] = '\0';
+				//data[10] = '\0';
 				printf("DATA = %s\n", data);
 				while(verificaData(data) != 1){
-					printf("Campo invalido ! Tente novamente: ");
-					fgets(data, 10, stdin);
-					data[strlen(data)] = '\0';
+					printf("3Campo invalido ! Tente novamente: ");
+					fgets(data, 11, stdin);
+					data[10] = '\0';
 				}
-				strcpy(vetor[cont].data, data);
+				//printf("tam data = %d\n", strlen(data));
+				//for(i = 0; i < strlen(data); i++) vetor[cont].data[i] = data[i];
 
 				//Le a duracao da partida, e verifica se possui 5 bytes
 				getchar();
 				fgets(duracao, 6, stdin);
+				i = 0;
+				while(duracao[i] != '\n') i++;
+				duracao[i] = '\0';
 				while(verificaDuracao(duracao) != 1){
-					printf("Campo invalido ! Tente novamente: ");
-					scanf("%s", duracao);
+					printf("5Campo invalido ! Tente novamente: ");
+					fgets(duracao, 6, stdin);
 				}
-				strcpy(vetor[cont].duracao, duracao);
+				//for(i = 0; i < strlen(duracao); i++) vetor[cont].duracao[i] = duracao[i];
 				
 				//Le o nome da equipe vencedora
-				nomeWinner = malloc(sizeof(char) * tamTotal + 1);
-				if(nomeWinner == NULL) exit(1);
+				printf("abababa\n");
 				getchar();
-				fgets(nomeWinner, tamTotal, stdin);
-				nomeWinner[strlen(nomeWinner) - 1] = '\0';
-
+				fgets(nomeWinner, 39, stdin);
+				i = 0;
+				while(nomeWinner[i] != '\n') i++;
+				nomeWinner[i] = '\0';
+				printf("nome venc = %s\n", nomeWinner);
+				//getchar();
 				//Le o placar da equipe azul, seguido pelo do vermelho, sempre verificando sua validade
-				scanf("%s", placarAzul);
-				placarAzul[strlen(placarAzul)] = '\0';
+				fgets(placarAzul, 3, stdin);
+				printf("placar azul = %s\n", placarAzul);
+				i = 0;
+				while(placarAzul[i] != '\n') i++;
+				placarAzul[i] = '\0';
 				while(verificaPlacar(placarAzul) != 1){
 					printf("Campo invalido ! Informe novamente: ");
-					scanf("%s", placarAzul);
-					placarAzul[strlen(placarAzul)] = '\0';
+					fgets(placarAzul, 3, stdin);
+					i = 0;
+					while(placarAzul[i] != '\n') i++;
+					placarAzul[i] = '\0';
 				}
-				strcpy(vetor[cont].placarAzul, placarAzul);
-				
-				scanf("%s", placarVerm);
-				while(verificaPlacar(placarAzul) != 1){
-					printf("Campo invalido ! Informe novamente: ");
-					scanf("%s", placarVerm);
-				}
-				strcpy(vetor[cont].placarVermelho, placarVerm);
-
+				printf("placar azul = %s\n", placarAzul);
 				getchar();
+;
+				fgets(placarVerm, 3, stdin);
+				i = 0; 
+				while(placarVerm[i] != '\n') i++;
+				placarVerm[i] = '\0';
+				//getchar();
+				printf("placar verm = %s\n", placarVerm);
+				while(verificaPlacar(placarVerm) != 1){
+					printf("1Campo invalido ! Informe novamente: ");
+					fgets(placarVerm, 3, stdin);
+					i = 0; 
+					while(placarVerm[i] != '\n') i++;
+					placarVerm[i] = '\0';
+				}
+				
 
 				//Verifica se o vencedor informado eh o vencedor real
-				while(verificaVencedor(nomeWinner, nomeAzul, nomeVermelho, placarAzul, placarVerm) != 1){
+				/*while(verificaVencedor(nomeWinner, vetor[cont].nomeAzul, vetor[cont].nomeVermelho, placarAzul, placarVerm) != 1){
 					printf("Campo invalido ! Informe novamente: ");
 					fgets(nomeWinner, tamTotal, stdin);
-					nomeWinner[strlen(nomeWinner) - 1] = '\0';
-				}
-				strcpy(vetor[cont].nomeWinner, nomeWinner);
-				
+				}*/
+				getchar();
+				printf("mvp abaixo\n");
 				//Le o apelido do MVP
-				apelidoMVP = malloc(sizeof(char) * (tamTotal - strlen(nomeWinner)) + 1);
-				if(apelidoMVP == NULL) exit(1);
-
-				tamTotal -= strlen(nomeWinner);
-				fgets(apelidoMVP, tamTotal, stdin);
-				apelidoMVP[strlen(apelidoMVP) - 1] = '\0';
-				strcpy(vetor[cont].apelidoMVP, apelidoMVP);
-
-
-				//Passa os valores informados ao vetor de registros
-				//Se for o primeiro registro, nao precisa realocar
-				//Mas se algum registro ja foi inserido, usa realloc
-				if(cont == 0){
-					//__fpurge(stdin);
-					//strcpy(vetor[cont].nomeAzul, nomeAzul);
-					//__fpurge(stdin);
-					//strcpy(vetor[cont].nomeVermelho, nomeVermelho);
-					//__fpurge(stdin);
-					//strcpy(vetor[cont].data, data);
-					//strcpy(vetor[cont].duracao, duracao);
-					//strcpy(vetor[cont].nomeWinner, nomeWinner);
-					//strcpy(vetor[cont].placarAzul, placarAzul);
-					//strcpy(vetor[cont].placarVermelho, placarVerm);
-					//strcpy(vetor[cont].apelidoMVP, apelidoMVP);
-					//strcpy(vetor[cont].chavePrimaria, geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
-				}else if(cont > 0){
-					char *temp = realloc(vetor, sizeof(Registro) * cont);
-					//strcpy(vetor[cont].nomeAzul, nomeAzul);
-					//strcpy(vetor[cont].nomeVermelho, nomeVermelho);
-					//strcpy(vetor[cont].data, data);
-					//strcpy(vetor[cont].duracao, duracao);
-					//strcpy(vetor[cont].nomeWinner, nomeWinner);
-					//strcpy(vetor[cont].placarAzul, placarAzul);
-					//strcpy(vetor[cont].placarVermelho, placarVerm);
-					//strcpy(vetor[cont].apelidoMVP, apelidoMVP);
-					//strcpy(vetor[cont].chavePrimaria, geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
-				}
-				cont++;
-				printf("CHAVE = %s\n", geraChave(nomeAzul, nomeVermelho, nomeWinner, placarAzul, placarVerm, data, duracao, apelidoMVP));
-				//printRegistro(vetor[cont - 1]);
+				fgets(apelidoMVP, 39, stdin);
+				i = 0;
+				while(apelidoMVP[i] != '\n') i++;
+				apelidoMVP[i] = '\0';
+				
 				printf("DATA = %s\n", data);
-				//printf("%s\n", vetor[cont - 1].data);
+				//Passa os valores lidos para o vetor de registros
+				for(i = 0; i < strlen(data); i++) vetor[cont].data[i] = data[i];
+				for(i = 0; i < strlen(duracao); i++) vetor[cont].duracao[i] = duracao[i];
+				for(i = 0; i < strlen(nomeWinner); i++) vetor[cont].nomeWinner[i] = nomeWinner[i];
+				for(i = 0; i < strlen(placarAzul); i++) vetor[cont].placarAzul[i] = placarAzul[i];
+				for(i = 0; i < strlen(placarVerm); i++) vetor[cont].placarVermelho[i] = placarVerm[i];
+				for(i = 0; i < strlen(apelidoMVP); i++) vetor[cont].apelidoMVP[i] = apelidoMVP[i];
+				
+				printf("tam data = %d\ndata = %s\n", strlen(data), vetor[cont].data);
+				//printRegistro(vetor[cont]);
+				
+				cont++;
 				break;
 			//Remove partida
 			case 2:
@@ -199,7 +201,10 @@ int main(){
 				//Decide o tipo de busca para cada uma das opcoes
 				if(op2 == 1){
 					//Busca por chave primaria
-					//fgets(buscaParam)
+					scanf("%s", buscaParam);
+					for(i = 0; i < cont; i++){
+						if(strcmp(vetor[i].chavePrimaria, buscaParam) == 0) printRegistro(vetor[i]);
+					}
 				}else if(op2 == 2){
 					//Busca por nome da equipe vencedora (chave secundaria)
 					
@@ -299,7 +304,7 @@ int verificaVencedor(char *nomeWinner, char *nomeAzul, char *nomeVermelho, char 
 	
 	if(pa > pv) strcpy(aux, nomeAzul);
 	else if(pv > pa) strcpy(aux, nomeVermelho);
-	
+
 	if(strcmp(aux, nomeWinner) == 0){
 		free(aux);
 		return 1;
