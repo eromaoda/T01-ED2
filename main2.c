@@ -25,6 +25,7 @@ int verificaVencedor(char *nomeAzul, char *nomeVermelho, char *winner, char *pla
 void insereArq(FILE *f, char *na, char *nv, char *data, char *dur, char *win, char *pla, char *plv, char *mvp, char *chave);
 int arqVazio(FILE *f);
 void carregaVetor(FILE *f, Registro *v);
+int comp(const void *a, const void *b);
 
 int RRN = 0;
 
@@ -128,6 +129,9 @@ int main(){
 				vetor[count].rrn = RRN;
 				
 				//Passa a chave e o RRN para o indice primario
+				//Primeiro, ordena-se o vetor pela chave primaria
+				qsort(vetor, count + 1, sizeof(char), comp);
+				//Em seguida, escrevemos os valores corretos no indice primario
 				//...
 				
 				RRN++;
@@ -153,7 +157,6 @@ int main(){
 				free(vetor);
 				fclose(matches);
 				return 0;
-				break;
 			default:
 				break;
 		}
@@ -262,4 +265,11 @@ int arqVazio(FILE *f){
 
 void carregaVetor(FILE *f, Registro *v){
 	
+}
+
+int comp(const void *a, const void *b){
+	Registro *aux1 = (Registro *) a;
+	Registro *aux2 = (Registro *) b;
+	
+	return (strcmp(aux1->chave, aux2->chave));
 }
