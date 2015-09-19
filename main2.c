@@ -26,16 +26,23 @@ void insereArq(FILE *f, char *na, char *nv, char *data, char *dur, char *win, ch
 int arqVazio(FILE *f);
 void carregaVetor(FILE *f, Registro *v);
 
+int RRN = 0;
+
 int main(){
-	int op;
+	int op, count = 0;
 	char chave[8], nomeAzul[39], nomeVermelho[39];
 	char data[10], duracao[5];
 	char nomeWinner[39], apelidoMVP[39];
 	char placarAzul[2], placarVermelho[2];
 	FILE *matches, *iprim, *isec, *iwinner, *imvp;
+	Registro *vetor;
 	
 	matches = fopen("matches.dat", "a+");
 	
+	vetor = malloc(sizeof(Registro) * 2);
+	if(vetor == NULL) exit(1);
+	
+	//Se ja houver registros no matches.dat, preenche o vetor com as chaves
 	if(arqVazio(matches) != 0){}
 	
 	while(1){
@@ -115,6 +122,16 @@ int main(){
 				//Inserir os valores no arquivo matches.dat
 				insereArq(matches, nomeAzul, nomeVermelho, data, duracao, nomeWinner, placarAzul, placarVermelho, apelidoMVP, chave);
 				
+				//Passar a chave e o RRN da partida pro vetor
+				vetor = realloc(vetor, sizeof(Registro) * (count + 1));
+				strcpy(vetor[count].chave, chave);
+				vetor[count].rrn = RRN;
+				
+				//Passa a chave e o RRN para o indice primario
+				//...
+				
+				RRN++;
+				
 				break;
 			//Remover registro
 			case 2:
@@ -131,8 +148,9 @@ int main(){
 			//Libera memoria
 			case 6:
 				break;
-			//Fianliza operacao
+			//Finaliza operacao
 			case 7:
+				free(vetor);
 				fclose(matches);
 				return 0;
 				break;
