@@ -23,6 +23,8 @@ int verificaDuracao(char *duracao);
 int verificaPlacar(char *placar);
 int verificaVencedor(char *nomeAzul, char *nomeVermelho, char *winner, char *placarAzul, char *placarVermelho);
 void insereArq(FILE *f, char *na, char *nv, char *data, char *dur, char *win, char *pla, char *plv, char *mvp, char *chave);
+int arqVazio(FILE *f);
+void carregaVetor(FILE *f, Registro *v);
 
 int main(){
 	int op;
@@ -31,6 +33,10 @@ int main(){
 	char nomeWinner[39], apelidoMVP[39];
 	char placarAzul[2], placarVermelho[2];
 	FILE *matches, *iprim, *isec, *iwinner, *imvp;
+	
+	matches = fopen("matches.dat", "a+");
+	
+	if(arqVazio(matches) != 0){}
 	
 	while(1){
 		printMenu();
@@ -107,6 +113,7 @@ int main(){
 				chave[8] = '\0';
 				
 				//Inserir os valores no arquivo matches.dat
+				insereArq(matches, nomeAzul, nomeVermelho, data, duracao, nomeWinner, placarAzul, placarVermelho, apelidoMVP, chave);
 				
 				break;
 			//Remover registro
@@ -126,6 +133,7 @@ int main(){
 				break;
 			//Fianliza operacao
 			case 7:
+				fclose(matches);
 				return 0;
 				break;
 			default:
@@ -210,5 +218,30 @@ int verificaVencedor(char *nomeAzul, char *nomeVermelho, char *winner, char *pla
 }
 
 void insereArq(FILE *f, char *na, char *nv, char *data, char *dur, char *win, char *pla, char *plv, char *mvp, char *chave){
+	char aux[MAX];
+	int i;
+	
+	//Passando os valores formatados para uma srting auxiliar,
+	//e a imprimindo no arquivo
+	sprintf(aux, "%s@%s@%s@%s@%s@%s@%s@%s@%s@", chave, na, nv, data, dur, win, pla, plv, mvp);
+	fprintf(f, "%s", aux);
+	
+	//Comletando com #'s
+	for(i = 0; i < (192 - strlen(aux)); i++) fprintf(f, "#");
+}
+
+int arqVazio(FILE *f){
+	int tam;
+	
+	fseek(f, 0L, SEEK_END);
+	tam = ftell(f);
+	fseek(f, 0L, SEEK_SET);
+	
+	if(tam == 0) return 1;
+	
+	return 0;
+}
+
+void carregaVetor(FILE *f, Registro *v){
 	
 }
