@@ -37,6 +37,7 @@ int flagMVPConsistente = 0;
 
 int main(){
 	int op, count = 0;
+	char chBusca[39];
 	char chave[8], nomeAzul[39], nomeVermelho[39];
 	char data[10], duracao[5];
 	char nomeWinner[39], apelidoMVP[39];
@@ -168,18 +169,54 @@ int main(){
 				//Indice do MVP
 				fprintf(imvp, "%s %s\n", vetorMVP[count].mvp, vetorMVP[count].chave);
 				
-				RRN++;
+				RRN += 192;
 				count++;
 				
 				break;
 			//Remover registro
 			case 2:
+				int encontrado = 0. rrnDeletar;
+				scanf("%[^\n]s", chBusca);
+				getchar();
+				
+				for(i = 0; i < count; i++){
+					if(strcmp(vetorPrim[i].chave, chBusca) == 0){
+						encontrado = 1;
+						rrnDeletar = vetorPrim[i].rrn;
+						vetorPrim[i].rrn = -1;
+						
+						
+					}
+				}
+				
+				if(encontrado == 0) printf("Registro nao encontrado!\n");
+				
 				break;
 			//Alterar registro
 			case 3:
 				break;
 			//Busca registro
 			case 4:
+				int op2, enc = 0;
+				printf("1. Busca por Codigo\n2. Busca por Nome da Equipe Vencedora\n3. Busca por Apelido do MVP\n");
+				scanf("%d", &op2);
+				if(op2 == 1){
+					scanf("%[^\n]s", chBusca);
+					getchar();
+					int i;
+					for(i = 0; i < count; i++){
+						if(strcmp(vetorPrim[i].chave, chBusca) == 0){
+							enc = 1;
+						}
+					}
+					
+					if(enc == 0) printf("Registro nao encontrado!\n");
+				}else if(op2 == 2){
+				
+				}else if(op2 == 3){
+				
+				}
+				
 				break;
 			//Lista registros
 			case 5:
@@ -213,7 +250,7 @@ int verificaData(char *data){
 	char dias[2], meses[2], anos[4];
 	int d, m, a;
 	
-	//Separa os dias, o mese e o ano da data
+	//Separa os dias, os meses e o ano da data
 	dias[0] = data[0];
 	dias[1] = data[1];
 	
