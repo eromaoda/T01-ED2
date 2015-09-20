@@ -184,8 +184,8 @@ int main(){
 						encontrado = 1;
 						rrnDeletar = vetorPrim[i].rrn;
 						vetorPrim[i].rrn = -1;
-						
-						
+						vetorPrim[i].chave[0] = '*';
+						vetorPrim[i].chave[1] = '|';
 					}
 				}
 				
@@ -194,16 +194,43 @@ int main(){
 				break;
 			//Alterar registro
 			case 3:
+				scanf("%[^\n]", chBusca);
+				int i, enc = 0, rrnBusca;
+				char novaDur[5];
+				
+				for(i = 0; i < count; i++){
+					if(strcmp(vetorPrim[i].chave, chBusca) == 0){
+						enc = 1;
+						rrnBusca = vetorPrim[i].rrn;
+						scanf("%[^\n]s", novaDur);
+						getchar();
+						while(verificaDuracao(novaDur) != 1){
+							printf("Campo invalido ! Tente novamente: ");
+							scanf("%[^\n]s", novaDur);
+							getchar();
+						}
+						//strcpy(vetorPrim[i].duracao, novaDur);
+						//substituir a duracao com base no rrn
+						//como faz ?
+						//...
+						
+						break;
+					}
+				}
+				
+				if(enc == 0) printf("Registro nao encontrado!\n");
+				
 				break;
 			//Busca registro
 			case 4:
-				int op2, enc = 0;
+				int op2, enc = 0, i;
 				printf("1. Busca por Codigo\n2. Busca por Nome da Equipe Vencedora\n3. Busca por Apelido do MVP\n");
 				scanf("%d", &op2);
 				if(op2 == 1){
+					enc = 0;
 					scanf("%[^\n]s", chBusca);
 					getchar();
-					int i;
+					
 					for(i = 0; i < count; i++){
 						if(strcmp(vetorPrim[i].chave, chBusca) == 0){
 							enc = 1;
@@ -212,7 +239,24 @@ int main(){
 					
 					if(enc == 0) printf("Registro nao encontrado!\n");
 				}else if(op2 == 2){
-				
+					int j, rrnBusca;
+					char ch[8];
+					enc = 0;
+					scanf("%[^\n]s", chBusca);
+					getchar();
+					
+					for(i = 0; i < count; i++){
+						if(strcmp(vetorWinner[i].winner, chBusca) == 0){
+							enc = 1;
+							strcpy(ch, vetorWinner[i].chave);
+							for(j = 0; j < count; j++){
+								if(strcmp(vetorPrim[j].chave, ch) == 0){
+									rrnBusca = vetorPrim[j].rrn;
+								}
+							}
+						}
+						
+					}
 				}else if(op2 == 3){
 				
 				}
