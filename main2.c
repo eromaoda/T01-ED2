@@ -14,6 +14,8 @@
 
 typedef struct reg{
 	char chave[8];
+	char mvp[39];
+	char winner[39];
 	int rrn;
 } Registro;
 
@@ -26,8 +28,12 @@ void insereArq(FILE *f, char *na, char *nv, char *data, char *dur, char *win, ch
 int arqVazio(FILE *f);
 void carregaVetor(FILE *f, Registro *v);
 int comp(const void *a, const void *b);
+int comp2(const void *a, const void *b);
+int comp3(const void *a, const void *b);
 
 int RRN = 0;
+int flagWinnerConsistente = 0;
+int flagMVPConsistente = 0;
 
 int main(){
 	int op, count = 0;
@@ -36,12 +42,21 @@ int main(){
 	char nomeWinner[39], apelidoMVP[39];
 	char placarAzul[2], placarVermelho[2];
 	FILE *matches, *iprim, *isec, *iwinner, *imvp;
-	Registro *vetor;
+	Registro *vetorPrim, *vetorWinner, *vetorMVP;
 	
 	matches = fopen("matches.dat", "a+");
+	iprim = fopen("iprimary.idx", "a+");
+	iwinner = fopen("iwinner.idx", "a+");
+	imvp = fopen("imvp.idx", "a+");
 	
-	vetor = malloc(sizeof(Registro) * 2);
-	if(vetor == NULL) exit(1);
+	vetorPrim = malloc(sizeof(Registro) * 2);
+	if(vetorPrim == NULL) exit(1);
+	
+	vetorWinner = malloc(sizeof(Registro) * 2);
+	if(vetorWinner == NULL) exit(1);
+	
+	vetorMVP = malloc(sizeof(Registro) * 2);
+	if(vetorMVP == NULL) exit(1);
 	
 	//Se ja houver registros no matches.dat, preenche o vetor com as chaves
 	if(arqVazio(matches) != 0){}
@@ -123,18 +138,38 @@ int main(){
 				//Inserir os valores no arquivo matches.dat
 				insereArq(matches, nomeAzul, nomeVermelho, data, duracao, nomeWinner, placarAzul, placarVermelho, apelidoMVP, chave);
 				
-				//Passar a chave e o RRN da partida pro vetor
-				vetor = realloc(vetor, sizeof(Registro) * (count + 1));
-				strcpy(vetor[count].chave, chave);
-				vetor[count].rrn = RRN;
+				//Passar a chave e o RRN da partida pro vetor primario
+				vetorPrim = realloc(vetorPrim, sizeof(Registro) * (count + 1));
+				strcpy(vetorPrim[count].chave, chave);
+				vetorPrim[count].rrn = RRN;
+				
+				//Passando o nome do vencedor e a chave primaria para o vetor de vencedores
+				vetorWinner = realloc(vetorWinner, sizeof(Registro) * (count + 1));
+				strcpy(vetorWinner[count].winner, nomeWinner);
+				strcpy(vetorWinner[count].chave, chave);
+				
+				//Passando o apelido do MVP e a chave primaria para o vetor dos MVP's
+				vetorMVP = realloc(vetorMVP, sizeof(Registro) * (count + 1));
+				strcpy(vetorMVP[count].mvp, nomeWinner);
+				strcpy(vetorMVP[count].chave, chave);
 				
 				//Passa a chave e o RRN para o indice primario
 				//Primeiro, ordena-se o vetor pela chave primaria
-				qsort(vetor, count + 1, sizeof(char), comp);
+				qsort(vetorPrim, count + 1, sizeof(char), comp);
 				//Em seguida, escrevemos os valores corretos no indice primario
-				//...
+				fprintf(iprim, "%s %d\n", vetorPrim[count].chave, vetorPrim[count].rrn);
+				
+				//Passando para os indices secundarios
+				//Ordena os vetores secundarios (nome do vencedor e apelido do MVP)
+				qsort(vetorWinner, count + 1, sizeof(char), comp2);
+				qsort(vetorMVP, count + 1, sizeof(char), comp3);
+				//Indice do nome do vencedor
+				fprintf(iwinner, "%s %s\n", vetorWinner[count].winner, vetorWinner[count].chave);
+				//Indice do MVP
+				fprintf(imvp, "%s %s\n", vetorMVP[count].mvp, vetorMVP[count].chave);
 				
 				RRN++;
+				count++;
 				
 				break;
 			//Remover registro
@@ -154,7 +189,12 @@ int main(){
 				break;
 			//Finaliza operacao
 			case 7:
-				free(vetor);
+				free(vetorPrim);
+				free(vetorWinner);
+				free(vetorMVP);
+				fclose(iprim);
+				fclose(iwinner);
+				fclose(imvp);
 				fclose(matches);
 				return 0;
 			default:
@@ -272,4 +312,18 @@ int comp(const void *a, const void *b){
 	Registro *aux2 = (Registro *) b;
 	
 	return (strcmp(aux1->chave, aux2->chave));
+}
+
+int comp2(const void *a, const void *b){
+	Registro *aux1 = (Registro *) a;
+	Registro *aux2 = (Registro *) b;
+	
+	return (strcmp(aux1->winner, aux2->winner));
+}
+
+int comp3(const void *a, const void *b){
+	Registro *aux1 = (Registro *) a;
+	Registro *aux2 = (Registro *) b;
+	
+	return (strcmp(aux1->mvp, aux2->mvp));
 }
