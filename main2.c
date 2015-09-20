@@ -19,6 +19,17 @@ typedef struct reg{
 	int rrn;
 } Registro;
 
+typedef struct partida{
+	char nAzul[39];
+	char nVerm[39];
+	char nWinner[39];
+	char data[10];
+	char duracao[5];
+	char plAz[2];
+	char plVe[2];
+	char mvp[39];
+} Partida;
+
 void printMenu();
 int verificaData(char *data);
 int verificaDuracao(char *duracao);
@@ -27,6 +38,9 @@ int verificaVencedor(char *nomeAzul, char *nomeVermelho, char *winner, char *pla
 void insereArq(FILE *f, char *na, char *nv, char *data, char *dur, char *win, char *pla, char *plv, char *mvp, char *chave);
 int arqVazio(FILE *f);
 void carregaVetor(FILE *f, Registro *v);
+void criaIndicePrim(FILE *f, Registro *v);
+void criaIndiceWin(FILE *f, Registro *v);
+void criaIndiceMVP(FILE *f, Registro *v);
 int comp(const void *a, const void *b);
 int comp2(const void *a, const void *b);
 int comp3(const void *a, const void *b);
@@ -37,6 +51,9 @@ int flagMVPConsistente = 0;
 
 int main(){
 	int op, count = 0;
+	int encontrado = 0, rrnDeletar, i;
+	int op2, enc = 0;
+	char dadosArq[192];
 	char chBusca[39];
 	char chave[8], nomeAzul[39], nomeVermelho[39];
 	char data[10], duracao[5];
@@ -175,7 +192,7 @@ int main(){
 				break;
 			//Remover registro
 			case 2:
-				int encontrado = 0. rrnDeletar;
+				//int encontrado = 0, rrnDeletar, i;
 				scanf("%[^\n]s", chBusca);
 				getchar();
 				
@@ -195,7 +212,7 @@ int main(){
 			//Alterar registro
 			case 3:
 				scanf("%[^\n]", chBusca);
-				int i, enc = 0, rrnBusca;
+				int enc = 0, rrnBusca;
 				char novaDur[5];
 				
 				for(i = 0; i < count; i++){
@@ -209,10 +226,10 @@ int main(){
 							scanf("%[^\n]s", novaDur);
 							getchar();
 						}
-						//strcpy(vetorPrim[i].duracao, novaDur);
+		
 						//substituir a duracao com base no rrn
 						//como faz ?
-						//...
+						
 						
 						break;
 					}
@@ -223,10 +240,13 @@ int main(){
 				break;
 			//Busca registro
 			case 4:
-				int op2, enc = 0, i;
+				//char dadosArq[192];
+				//int op2, enc = 0, i;
 				printf("1. Busca por Codigo\n2. Busca por Nome da Equipe Vencedora\n3. Busca por Apelido do MVP\n");
 				scanf("%d", &op2);
+				getchar();
 				if(op2 == 1){
+					int rrnBusca, j;
 					enc = 0;
 					scanf("%[^\n]s", chBusca);
 					getchar();
@@ -234,6 +254,15 @@ int main(){
 					for(i = 0; i < count; i++){
 						if(strcmp(vetorPrim[i].chave, chBusca) == 0){
 							enc = 1;
+							rrnBusca = vetorPrim[i].rrn;
+							
+							//Se o arquivo de dados nao esta vazio
+							if(arqVazio(matches) == 0){
+								fseek(matches, rrnBusca, SEEK_SET);
+								for(j = 0; j < 191; i++) dadosArq[i] = fgetc(matches);
+								dadosArq[192] = '\0';
+								printf("string louca: %s\n", dadosArq);
+							}
 						}
 					}
 					
@@ -407,4 +436,27 @@ int comp3(const void *a, const void *b){
 	Registro *aux2 = (Registro *) b;
 	
 	return (strcmp(aux1->mvp, aux2->mvp));
+}
+
+void criaIndicePrim(FILE *f, Registro *v){
+	int tam, i, j, cont = 0;
+	char aux[192];
+	
+	fseek(f, 0L, SEEK_END);
+	tam = ftell(f);
+	fseek(f, 0L, SEEK_SET);
+	
+	for(i = 0; i < tam; i += 192){
+		for(j = 0; j < 7; i++) v[i].chave[i] = fgetc(f);
+		aux[8] = '\0';
+		v[i].rrn = i;
+	}
+}
+
+void criaIndiceWin(FILE *f, Registro *v){
+
+}
+
+void criaIndiceMVP(FILE *f, Registro *v){
+
 }
