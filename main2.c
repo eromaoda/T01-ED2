@@ -76,8 +76,21 @@ int main(){
 	vetorMVP = malloc(sizeof(Registro) * 2);
 	if(vetorMVP == NULL) exit(1);
 	
-	//Se ja houver registros no matches.dat, preenche o vetor com as chaves
-	if(arqVazio(matches) != 0){}
+	//Se ja houver registros no matches.dat, preenche os vetores de indice com as chaves
+	if(arqVazio(matches) != 0){
+		int t;
+		char aux1[39], aux2[39], aux3[39];
+		char aux4[39], aux5[39], aux6[39];
+		
+		fseek(matches, 0L, SEEK_END);
+		t = ftell(matches);
+		fseek(matches, 0L, SEEK_SET);
+		
+		for(i = 0; i < t; i += 192){
+			fscanf(matches, "%s@%s@%s@%s@%s@%s@%s@%s@%s@", vetorPrim[count].chave, aux1, aux2, aux3, aux4, vetorWinner[count].winner, aux5, aux6, vetorMVP[count].mvp);
+			vetorPrim[count].rrn = i;	
+		}
+	}
 	
 	while(1){
 		printMenu();
