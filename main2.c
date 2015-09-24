@@ -88,7 +88,10 @@ int main(){
 		
 		for(i = 0; i < t; i += 192){
 			fscanf(matches, "%s@%s@%s@%s@%s@%s@%s@%s@%s@", vetorPrim[count].chave, aux1, aux2, aux3, aux4, vetorWinner[count].winner, aux5, aux6, vetorMVP[count].mvp);
-			vetorPrim[count].rrn = i;	
+			vetorPrim[count].rrn = i;
+			strcpy(vetorWinner[count].chave, vetorPrim[count].chave);
+			strcpy(vetorMVP[count].chave, vetorPrim[count].chave);	
+	
 		}
 	}
 	
@@ -301,14 +304,95 @@ int main(){
 					}
 				}else if(op2 == 3){
 				
-				}
+				}else printf("Opcao invalida!\n");
 				
 				break;
 			//Lista registros
 			case 5:
+				
+				printf("1. Listagem por codigo\n2. Listagem por nome da equipe vencedora\n3. Listagem por apelido do MVP\n");
+				scanf("%d", &op2);
+				
+				//Busca pela chave primaria
+				if(op2 == 1){
+					if(arqVazio(matches) == 1) printf("Arquivo vazio!\n");
+					else{
+						int rrnBusca, enc = 0;
+						char *aux, c;
+						char *imprNA, *imprNV, *imprNW;
+						char *imprPA, *imprPV, *ch;
+						char *imprData, *imprDur, *imprMVP;
+						int j;
+						qsort(vetorPrim, count + 1, sizeof(char), comp);
+						
+						aux = malloc(sizeof(char) * 192 + 1);
+						if(aux == NULL) exit(1);
+						imprNA = malloc(sizeof(char) * 39 + 1);
+						if(imprNA == NULL) exit(1);
+						imprNV = malloc(sizeof(char) * 39 + 1);
+						if(imprNV == NULL) exit(1);
+						imprNW = malloc(sizeof(char) * 39 + 1);
+						if(imprNW == NULL) exit(1);
+						imprMVP = malloc(sizeof(char) * 39 + 1);
+						if(imprMVP == NULL) exit(1);
+						imprData = malloc(sizeof(char) * 10 + 1);
+						if(imprData == NULL) exit(1);
+						imprDur = malloc(sizeof(char) * 5 + 1);
+						if(imprDur == NULL) exit(1);
+						imprPA = malloc(sizeof(char) * 2 + 1);
+						if(imprPA == NULL) exit(1);
+						imprPV = malloc(sizeof(char) * 2 + 1);
+						if(imprPV == NULL) exit(1);
+						ch = malloc(sizeof(char) * 8 + 1);
+						if(ch == NULL) exit(1);
+						
+						for(i = 0; i < count; i++){
+							//pega todo o registro do arquivo de dados
+							if(vetorPrim[i].rrn != -1){
+								fseek(matches, vetorPrim[i].rrn, SEEK_SET);
+								for(j = 0; j < 192; j++){
+									c = fgetc(matches);
+									if(c == '#') break;
+									else aux[i] = c;
+								}
+								//tratamento dos dados para impressao
+								ch = strtok(aux, "@");
+								imprNA = strtok(NULL, "@");
+								imprNV = strtok(NULL, "@");
+								imprData = strtok(NULL, "@");
+								imprDur = strtok(NULL, "@");
+								imprNW = strtok(NULL, "@");
+								imprPA = strtok(NULL, "@");
+								imprPV = strtok(NULL, "@");
+								imprMVP = strtok(NULL, "@");
+								
+								//Imprimindo o registro
+								printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n", ch, imprNA, imprNV, imprData, imprDur, imprNW, imprPA, imprPV, imprMVP);
+							}
+						}
+						free(imprNA);
+						free(imprNV);
+						free(imprNW);
+						free(imprMVP);
+						free(imprData);
+						free(imprDur);
+						free(imprPA);
+						free(imprPV);
+						free(ch);
+					}
+				//Busca pelo nome da equipe vencedora
+				}else if(op2 == 2){
+				
+				}else if(op2 == 3){
+				
+				}else printf("Opcao invalida!\n");
+				
 				break;
 			//Libera memoria
 			case 6:
+				//Verifica quem esta marcado para remocao (*|) e finaliza a op
+				//...
+				
 				break;
 			//Finaliza operacao
 			case 7:
@@ -316,7 +400,7 @@ int main(){
 				free(vetorWinner);
 				free(vetorMVP);
 				fclose(iprim);
-				fclose(iwinner);
+				fclose(iwinner);	
 				fclose(imvp);
 				fclose(matches);
 				return 0;
