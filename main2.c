@@ -309,22 +309,24 @@ int main(){
 				break;
 			//Lista registros
 			case 5:
-				
-				printf("1. Listagem por codigo\n2. Listagem por nome da equipe vencedora\n3. Listagem por apelido do MVP\n");
-				scanf("%d", &op2);
-				
-				//Busca pela chave primaria
-				if(op2 == 1){
-					if(arqVazio(matches) == 1) printf("Arquivo vazio!\n");
-					else{
+				if(arqVazio(matches) == 1) printf("Arquivo vazio!\n");
+				else{
+					printf("1. Listagem por codigo\n2. Listagem por nome da equipe vencedora\n3. Listagem por apelido do MVP\n");
+					scanf("%d", &op2);
+					
+					//Busca pela chave primaria
+					if(op2 == 1){
+						//if(arqVazio(matches) == 1) printf("Arquivo vazio!\n");
+						
 						int rrnBusca, enc = 0;
 						char *aux, c;
 						char *imprNA, *imprNV, *imprNW;
 						char *imprPA, *imprPV, *ch;
 						char *imprData, *imprDur, *imprMVP;
 						int j;
+				
 						qsort(vetorPrim, count + 1, sizeof(char), comp);
-						
+							
 						aux = malloc(sizeof(char) * 192 + 1);
 						if(aux == NULL) exit(1);
 						imprNA = malloc(sizeof(char) * 39 + 1);
@@ -345,7 +347,7 @@ int main(){
 						if(imprPV == NULL) exit(1);
 						ch = malloc(sizeof(char) * 8 + 1);
 						if(ch == NULL) exit(1);
-						
+							
 						for(i = 0; i < count; i++){
 							//pega todo o registro do arquivo de dados
 							if(vetorPrim[i].rrn != -1){
@@ -355,21 +357,23 @@ int main(){
 									if(c == '#') break;
 									else aux[i] = c;
 								}
-								//tratamento dos dados para impressao
-								ch = strtok(aux, "@");
-								imprNA = strtok(NULL, "@");
-								imprNV = strtok(NULL, "@");
-								imprData = strtok(NULL, "@");
-								imprDur = strtok(NULL, "@");
-								imprNW = strtok(NULL, "@");
-								imprPA = strtok(NULL, "@");
-								imprPV = strtok(NULL, "@");
-								imprMVP = strtok(NULL, "@");
-								
-								//Imprimindo o registro
-								printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n", ch, imprNA, imprNV, imprData, imprDur, imprNW, imprPA, imprPV, imprMVP);
 							}
+						
+							//tratamento dos dados para impressao
+							ch = strtok(aux, "@");
+							imprNA = strtok(NULL, "@");
+							imprNV = strtok(NULL, "@");
+							imprData = strtok(NULL, "@");
+							imprDur = strtok(NULL, "@");
+							imprNW = strtok(NULL, "@");
+							imprPA = strtok(NULL, "@");
+							imprPV = strtok(NULL, "@");
+							imprMVP = strtok(NULL, "@");
+										
+							//Imprimindo o registro
+							printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n", ch, imprNA, imprNV, imprData, imprDur, imprNW, imprPA, imprPV, imprMVP);
 						}
+					
 						free(imprNA);
 						free(imprNV);
 						free(imprNW);
@@ -379,13 +383,68 @@ int main(){
 						free(imprPA);
 						free(imprPV);
 						free(ch);
-					}
-				//Busca pelo nome da equipe vencedora
-				}else if(op2 == 2){
 				
-				}else if(op2 == 3){
-				
-				}else printf("Opcao invalida!\n");
+					//Busca pelo nome da equipe vencedora
+					}else if(op2 == 2){
+						char chav[8], aux[192], c;
+						int r, x, j;
+						
+						qsort(vetorWinner, count + 1, sizeof(char), comp2);
+						
+						for(i = 0; i < count; i++){
+							strcpy(chav, vetorWinner[i].chave);
+							for(j = 0; j < count; j++){
+								if(strcmp(chav, vetorPrim[j].chave) == 0) r = vetorPrim[j].rrn;
+								if(r != -1){
+									fseek(matches, r, SEEK_SET);
+									for(x = 0; x < 192; x++){
+										c = fgetc(matches);
+										if(c != '#') aux[x] = c;
+										else break;
+									}
+									aux[192] = '\0';
+									x = 0;
+									while(aux[x] != '\0'){
+										if(aux[x] != '@') printf("%c", aux[x]);
+										else printf("\n");
+										x++;
+									}
+									printf("\n");
+								}
+							}
+						}
+					}else if(op2 == 3){
+						char chav[8], aux[192], c;
+						int r, x, j;
+						
+						qsort(vetorMVP, count + 1, sizeof(char), comp3);
+						
+						for(i = 0; i < count; i++){
+							strcpy(chav, vetorMVP[i].chave);
+							for(j = 0; j < count; j++){
+								if(strcmp(chav, vetorPrim[j].chave) == 0) r = vetorPrim[j].rrn;
+								if(r != -1){
+									fseek(matches, r, SEEK_SET);
+									for(x = 0; x < 192; x++){
+										c = fgetc(matches);
+										if(c != '#') aux[x] = c;
+										else break;
+									}
+									aux[192] = '\0';
+									x = 0;
+									while(aux[x] != '\0'){
+										if(aux[x] != '@') printf("%c", aux[x]);
+										else printf("\n");
+										x++;
+									}
+									printf("\n");
+								}
+							}
+						}
+					}else printf("Opcao invalida!\n");
+					
+					fseek(matches, 0L, SEEK_SET);
+				}
 				
 				break;
 			//Libera memoria
