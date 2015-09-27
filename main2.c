@@ -50,10 +50,10 @@ int flagWinnerConsistente = 0;
 int flagMVPConsistente = 0;
 
 int main(){
-	int op, count = 0;
+	int op, count = 0, tam;
 	int encontrado = 0, rrnDeletar, i;
 	int op2, enc = 0;
-	char dadosArq[192];
+	char dadosArq[192], aux[2];
 	char chBusca[39];
 	char chave[8], nomeAzul[39], nomeVermelho[39];
 	char data[10], duracao[5];
@@ -450,7 +450,13 @@ int main(){
 			//Libera memoria
 			case 6:
 				//Verifica quem esta marcado para remocao (*|) e finaliza a op
-				//...
+				fseek(matches, 0L, SEEK_END);
+				tam = ftell(matches);
+				fseek(matches, 0L, SEEK_SET);
+				
+				for(i = 0; i < tam; i += 192){
+					//TODO code ...
+				}
 				
 				break;
 			//Finaliza operacao
