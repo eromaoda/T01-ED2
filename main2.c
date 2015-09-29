@@ -87,19 +87,12 @@ int main(){
 		fseek(matches, 0L, SEEK_SET);
 		
 		for(i = 0; i < t; i += 192){
-			
-			//fscanf(matches, "%s@%s@%s@%s@%s@%s@%s@%s@%s@", vetorPrim[count].chave, aux1, aux2, aux3, aux4, vetorWinner[count].winner, aux5, aux6, vetorMVP[count].mvp);
 			fseek(matches, i, SEEK_SET);
-			
 			for(j = 0; j < 192; j++){
-				
 				rgStr[j] = fgetc(matches);
-			}
-			
+			}			
 			rgStr[192] = '\0';
-			//printf("reg = %s\n", rgStr);
-			//funcao de gerar indice
-			//geraIndice(rgStr, vetorPrim, vetorWinner, vetorMVP, count);
+
 			char auxiliar[192], *ch, *c1, *w, *m;
 			int x = 0;
 			
@@ -144,8 +137,11 @@ int main(){
 			for(k = 0; k < strlen(ch); k++) vetorWinner[count].chave[k] = ch[k];
 			
 			//strcpy(vetorMVP[count].chave, ch);
+			//printf("chave mvp = %s\n", ch);
 			for(k = 0; k < strlen(ch); k++) vetorMVP[count].chave[k] = ch[k];
+			//printf("chave mvp no vet = %s\n", vetorMVP[count].chave);
 			for(k = 0; k < strlen(w); k++) vetorWinner[count].winner[k] = w[k];
+			//printf("mvp = %s\n", m);
 			for(k = 0; k < strlen(m); k++) vetorMVP[count].mvp[k] = m[k];
 			
 			/*free(ch);
@@ -336,7 +332,6 @@ int main(){
 					enc = 0;
 					scanf("%[^\n]s", chBusca);
 					getchar();
-					//printf("%s\n", chBusca);
 					
 					for(i = 0; i < count; i++){
 						if(strcmp(vetorPrim[i].chave, chBusca) == 0){
@@ -345,35 +340,33 @@ int main(){
 							break;
 						}
 					}
-						if(enc == 1){
-							//Se o arquivo de dados nao esta vazio
-							if(arqVazio(matches) == 0){
-								
-								fseek(matches, rrnBusca, SEEK_SET);
-								
-								for(j = 0; j < 191; j++){
-									dadosArq[j] = fgetc(matches);
-								}
-								dadosArq[192] = '\0';
-								//printf("string louca: %s\n", dadosArq);
-								int x = 0;
-								char a[192];
-								while(dadosArq[x] != '#'){
-									a[x] = dadosArq[x];
-									x++;
-								}
-								a[x] = '\0';
-								printf("%s\n", strtok(a, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("\n");
+					if(enc == 1){
+						//Se o arquivo de dados nao esta vazio
+						if(arqVazio(matches) == 0){	
+							fseek(matches, rrnBusca, SEEK_SET);
+							for(j = 0; j < 191; j++){
+								dadosArq[j] = fgetc(matches);
 							}
+							dadosArq[192] = '\0';
+							//printf("string louca: %s\n", dadosArq);
+							int x = 0;
+							char a[192];
+							while(dadosArq[x] != '#'){
+								a[x] = dadosArq[x];
+								x++;
+							}
+							a[x] = '\0';
+							printf("%s\n", strtok(a, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("\n");
+						}
 						}else printf("Registro nao encontrado!\n");
 					fseek(matches, 0L, SEEK_SET);
 				}else if(op2 == 2){
@@ -382,33 +375,25 @@ int main(){
 					enc = 0;
 					scanf("%[^\n]s", chBusca);
 					getchar();
-					//printf("%s\n", chBusca);
 					for(i = 0; i < count; i++){
-						//printf("lol\n");
 						if(strcmp(vetorWinner[i].winner, chBusca) == 0){
 							enc = 1;
 							strcpy(ch, vetorWinner[i].chave);
-								//printf("oi\n");
 								for(j = 0; j < count; j++){
-									//printf("%s\t%s\n", vetorPrim[j].chave, ch);
-									//printf("%d\n", strcmp(vetorPrim[j].chave, ch));
 									if((strcmp(vetorPrim[j].chave, ch)) == 0){
 										vai = 1;
 										rrnBusca = vetorPrim[j].rrn;
 									}
-									//printf("rrn busca = %d\n", rrnBusca);
 									fseek(matches, 0L, SEEK_END);
 									fileLen = ftell(matches);
 									fseek(matches, 0L, SEEK_SET);
 									if(vai == 1){
 										if(fileLen != 0){
-											//printf("ola\n");
 											fseek(matches, rrnBusca, SEEK_SET);
 											for(j = 0; j < 191; j++){
 												dadosArq[j] = fgetc(matches);
 											}
 											dadosArq[192] = '\0';
-											//printf("string louca: %s\n", dadosArq);
 											int x = 0;
 											char a[192];
 											while(dadosArq[x] != '#'){
@@ -427,14 +412,61 @@ int main(){
 											printf("%s\n", strtok(NULL, "@"));
 											printf("\n");
 										}
-									} vai = 0;
+									} 
+									vai = 0;
 								}
 							}
 						}
-						if(enc == 0) printf("arq n enc\n");
-					
+					if(enc == 0) printf("Registro nao encontrado!\n");	
 				}else if(op2 == 3){
-				
+					int j, rrnBusca, vai = 0;
+					char ch[8];
+					enc = 0;
+					scanf("%[^\n]s", chBusca);
+					getchar();
+					for(i = 0; i < count; i++){
+						if(strcmp(vetorMVP[i].mvp, chBusca) == 0){
+							enc = 1;
+							vetorMVP[i].chave[8] = '\0';
+							strcpy(ch, vetorMVP[i].chave);
+							for(j = 0; j < count; j++){
+								if((strcmp(vetorPrim[j].chave, ch)) == 0){
+									vai = 1;
+									rrnBusca = vetorPrim[j].rrn;
+								}
+								fseek(matches, 0L, SEEK_END);
+								fileLen = ftell(matches);
+								fseek(matches, 0L, SEEK_SET);
+								if(vai == 1){
+									if(fileLen != 0){
+										fseek(matches, rrnBusca, SEEK_SET);
+										for(j = 0; j < 191; j++){
+											dadosArq[j] = fgetc(matches);
+										}
+										dadosArq[192] = '\0';
+										int x = 0;
+										char a[192];
+										while(dadosArq[x] != '#'){
+											a[x] = dadosArq[x];
+											x++;
+										}
+										a[x] = '\0';
+										printf("%s\n", strtok(a, "@"));
+										printf("%s\n", strtok(NULL, "@"));
+										printf("%s\n", strtok(NULL, "@"));
+										printf("%s\n", strtok(NULL, "@"));
+										printf("%s\n", strtok(NULL, "@"));
+										printf("%s\n", strtok(NULL, "@"));
+										printf("%s\n", strtok(NULL, "@"));
+										printf("%s\n", strtok(NULL, "@"));
+										printf("%s\n", strtok(NULL, "@"));
+										printf("\n");
+									}
+								} vai = 0;
+							}
+						}
+					}
+					if(enc == 0) printf("Registro nao encontrado!\n");						
 				}else printf("Opcao invalida!\n");
 				
 				break;
@@ -447,8 +479,6 @@ int main(){
 					
 					//Busca pela chave primaria
 					if(op2 == 1){
-						//if(arqVazio(matches) == 1) printf("Arquivo vazio!\n");
-						
 						int rrnBusca, enc = 0;
 						char *aux, c;
 						char *imprNA, *imprNV, *imprNW;
@@ -457,27 +487,6 @@ int main(){
 						int j;
 				
 						qsort(vetorPrim, count + 1, sizeof(char), comp);
-							
-						aux = malloc(sizeof(char) * 192 + 1);
-						if(aux == NULL) exit(1);
-						imprNA = malloc(sizeof(char) * 39 + 1);
-						if(imprNA == NULL) exit(1);
-						imprNV = malloc(sizeof(char) * 39 + 1);
-						if(imprNV == NULL) exit(1);
-						imprNW = malloc(sizeof(char) * 39 + 1);
-						if(imprNW == NULL) exit(1);
-						imprMVP = malloc(sizeof(char) * 39 + 1);
-						if(imprMVP == NULL) exit(1);
-						imprData = malloc(sizeof(char) * 10 + 1);
-						if(imprData == NULL) exit(1);
-						imprDur = malloc(sizeof(char) * 5 + 1);
-						if(imprDur == NULL) exit(1);
-						imprPA = malloc(sizeof(char) * 2 + 1);
-						if(imprPA == NULL) exit(1);
-						imprPV = malloc(sizeof(char) * 2 + 1);
-						if(imprPV == NULL) exit(1);
-						ch = malloc(sizeof(char) * 8 + 1);
-						if(ch == NULL) exit(1);
 							
 						for(i = 0; i < count; i++){
 							//pega todo o registro do arquivo de dados
@@ -491,30 +500,16 @@ int main(){
 							}
 						
 							//tratamento dos dados para impressao
-							ch = strtok(aux, "@");
-							imprNA = strtok(NULL, "@");
-							imprNV = strtok(NULL, "@");
-							imprData = strtok(NULL, "@");
-							imprDur = strtok(NULL, "@");
-							imprNW = strtok(NULL, "@");
-							imprPA = strtok(NULL, "@");
-							imprPV = strtok(NULL, "@");
-							imprMVP = strtok(NULL, "@");
-										
-							//Imprimindo o registro
-							printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n", ch, imprNA, imprNV, imprData, imprDur, imprNW, imprPA, imprPV, imprMVP);
+							printf("%s\n", strtok(aux, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
+							printf("%s\n", strtok(NULL, "@"));
 						}
-					
-						free(imprNA);
-						free(imprNV);
-						free(imprNW);
-						free(imprMVP);
-						free(imprData);
-						free(imprDur);
-						free(imprPA);
-						free(imprPV);
-						free(ch);
-				
 					//Busca pelo nome da equipe vencedora
 					}else if(op2 == 2){
 						char chav[8], aux[192], c;
