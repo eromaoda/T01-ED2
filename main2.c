@@ -11,6 +11,7 @@
 #include<string.h>
 
 #define MAX 192
+#define TOT 10000
 
 typedef struct reg{
 	char chave[8];
@@ -44,40 +45,48 @@ void criaIndiceMVP(FILE *f, Registro *v);
 int comp(const void *a, const void *b);
 int comp2(const void *a, const void *b);
 int comp3(const void *a, const void *b);
+int chaveJaExiste(Registro *v, char *ch, int k);
+void geraIndice(char *rgStr, Registro *v1, Registro *v2, Registro *v3, int k);
 
 int RRN = 0;
+int count = 0;
 int flagWinnerConsistente = 0;
 int flagMVPConsistente = 0;
 
 int main(){
 	int op, count = 0, tam;
-	int encontrado = 0, rrnDeletar, i;
+	int encontrado = 0, rrnDeletar, i, j;
 	int op2, enc = 0;
-	char dadosArq[192], aux[2];
-	char chBusca[39];
+	char dadosArq[192], aux[2], str[192];
+	char chBusca[39], rgStr[192];
 	char chave[8], nomeAzul[39], nomeVermelho[39];
 	char data[10], duracao[5];
 	char nomeWinner[39], apelidoMVP[39];
 	char placarAzul[2], placarVermelho[2];
 	FILE *matches, *iprim, *isec, *iwinner, *imvp;
-	Registro *vetorPrim, *vetorWinner, *vetorMVP;
+	Registro vetorPrim[TOT], vetorWinner[TOT], vetorMVP[TOT];
 	
 	matches = fopen("matches.dat", "a+");
 	iprim = fopen("iprimary.idx", "a+");
 	iwinner = fopen("iwinner.idx", "a+");
 	imvp = fopen("imvp.idx", "a+");
 	
-	vetorPrim = malloc(sizeof(Registro) * 2);
+	/*vetorPrim = malloc(sizeof(Registro) * 2);
 	if(vetorPrim == NULL) exit(1);
 	
 	vetorWinner = malloc(sizeof(Registro) * 2);
 	if(vetorWinner == NULL) exit(1);
 	
 	vetorMVP = malloc(sizeof(Registro) * 2);
-	if(vetorMVP == NULL) exit(1);
+	if(vetorMVP == NULL) exit(1);*/
+	
+	fseek(matches, 0L, SEEK_END);
+	int fileLen = ftell(matches);
+	fseek(matches, 0L, SEEK_SET);
+	printf("t = %d\n", fileLen);
 	
 	//Se ja houver registros no matches.dat, preenche os vetores de indice com as chaves
-	if(arqVazio(matches) != 0){
+	if(fileLen != 0){
 		int t;
 		char aux1[39], aux2[39], aux3[39];
 		char aux4[39], aux5[39], aux6[39];
@@ -87,14 +96,28 @@ int main(){
 		fseek(matches, 0L, SEEK_SET);
 		
 		for(i = 0; i < t; i += 192){
-			fscanf(matches, "%s@%s@%s@%s@%s@%s@%s@%s@%s@", vetorPrim[count].chave, aux1, aux2, aux3, aux4, vetorWinner[count].winner, aux5, aux6, vetorMVP[count].mvp);
-			vetorPrim[count].rrn = i;
+			
+			//fscanf(matches, "%s@%s@%s@%s@%s@%s@%s@%s@%s@", vetorPrim[count].chave, aux1, aux2, aux3, aux4, vetorWinner[count].winner, aux5, aux6, vetorMVP[count].mvp);
+			fseek(matches, i, SEEK_SET);
+			
+			for(j = 0; j < 192; j++){
+				rgStr[j] = fgetc(matches);
+			}
+			
+			rgStr[192] = '\0';
+			
+			//funcao de gerar indice
+			//geraIndice(rgStr, vetorPrim, vetorWinner, vetorMVP, count);
+			printf("caca\n");
+			/*vetorPrim[count].rrn = i;
 			strcpy(vetorWinner[count].chave, vetorPrim[count].chave);
-			strcpy(vetorMVP[count].chave, vetorPrim[count].chave);	
-	
+			strcpy(vetorMVP[count].chave, vetorPrim[count].chave);*/
+			count++;	
 		}
-	}
-	
+		printf("count = %d\n", count);
+		for(i = 0; i < count; i++) printf("%s %d\n", vetorPrim[i].chave, vetorPrim[i].rrn);
+	}else printf("arquivo de dados vazio !\n");
+	fseek(matches, 0L, SEEK_SET);
 	while(1){
 		printMenu();
 		scanf("%d", &op);
@@ -169,41 +192,44 @@ int main(){
 				chave[7] = data[4];
 				chave[8] = '\0';
 				
-				//Inserir os valores no arquivo matches.dat
-				insereArq(matches, nomeAzul, nomeVermelho, data, duracao, nomeWinner, placarAzul, placarVermelho, apelidoMVP, chave);
-				
-				//Passar a chave e o RRN da partida pro vetor primario
-				vetorPrim = realloc(vetorPrim, sizeof(Registro) * (count + 1));
-				strcpy(vetorPrim[count].chave, chave);
-				vetorPrim[count].rrn = RRN;
-				
-				//Passando o nome do vencedor e a chave primaria para o vetor de vencedores
-				vetorWinner = realloc(vetorWinner, sizeof(Registro) * (count + 1));
-				strcpy(vetorWinner[count].winner, nomeWinner);
-				strcpy(vetorWinner[count].chave, chave);
-				
-				//Passando o apelido do MVP e a chave primaria para o vetor dos MVP's
-				vetorMVP = realloc(vetorMVP, sizeof(Registro) * (count + 1));
-				strcpy(vetorMVP[count].mvp, nomeWinner);
-				strcpy(vetorMVP[count].chave, chave);
-				
-				//Passa a chave e o RRN para o indice primario
-				//Primeiro, ordena-se o vetor pela chave primaria
-				qsort(vetorPrim, count + 1, sizeof(char), comp);
-				//Em seguida, escrevemos os valores corretos no indice primario
-				fprintf(iprim, "%s %d\n", vetorPrim[count].chave, vetorPrim[count].rrn);
-				
-				//Passando para os indices secundarios
-				//Ordena os vetores secundarios (nome do vencedor e apelido do MVP)
-				qsort(vetorWinner, count + 1, sizeof(char), comp2);
-				qsort(vetorMVP, count + 1, sizeof(char), comp3);
-				//Indice do nome do vencedor
-				fprintf(iwinner, "%s %s\n", vetorWinner[count].winner, vetorWinner[count].chave);
-				//Indice do MVP
-				fprintf(imvp, "%s %s\n", vetorMVP[count].mvp, vetorMVP[count].chave);
-				
-				RRN += 192;
-				count++;
+				if(chaveJaExiste(vetorPrim, chave, count) == 1) printf("ERRO: Já existe um registro com a chave primária %s.\n", chave);
+				else{
+					//Inserir os valores no arquivo matches.dat
+					insereArq(matches, nomeAzul, nomeVermelho, data, duracao, nomeWinner, placarAzul, placarVermelho, apelidoMVP, chave);
+					
+					//Passar a chave e o RRN da partida pro vetor primario
+					//vetorPrim = realloc(vetorPrim, sizeof(Registro) * (count + 1));
+					strcpy(vetorPrim[count].chave, chave);
+					vetorPrim[count].rrn = RRN;
+					
+					//Passando o nome do vencedor e a chave primaria para o vetor de vencedores
+					//vetorWinner = realloc(vetorWinner, sizeof(Registro) * (count + 1));
+					strcpy(vetorWinner[count].winner, nomeWinner);
+					strcpy(vetorWinner[count].chave, chave);
+					
+					//Passando o apelido do MVP e a chave primaria para o vetor dos MVP's
+					//vetorMVP = realloc(vetorMVP, sizeof(Registro) * (count + 1));
+					strcpy(vetorMVP[count].mvp, nomeWinner);
+					strcpy(vetorMVP[count].chave, chave);
+					
+					//Passa a chave e o RRN para o indice primario
+					//Primeiro, ordena-se o vetor pela chave primaria
+					qsort(vetorPrim, count + 1, sizeof(char), comp);
+					//Em seguida, escrevemos os valores corretos no indice primario
+					fprintf(iprim, "%s %d\n", vetorPrim[count].chave, vetorPrim[count].rrn);
+					
+					//Passando para os indices secundarios
+					//Ordena os vetores secundarios (nome do vencedor e apelido do MVP)
+					qsort(vetorWinner, count + 1, sizeof(char), comp2);
+					qsort(vetorMVP, count + 1, sizeof(char), comp3);
+					//Indice do nome do vencedor
+					fprintf(iwinner, "%s %s\n", vetorWinner[count].winner, vetorWinner[count].chave);
+					//Indice do MVP
+					fprintf(imvp, "%s %s\n", vetorMVP[count].mvp, vetorMVP[count].chave);
+					
+					RRN += 192;
+					count++;
+				}
 				
 				break;
 			//Remover registro
@@ -266,7 +292,7 @@ int main(){
 					enc = 0;
 					scanf("%[^\n]s", chBusca);
 					getchar();
-					
+					printf("%s\n", chBusca);
 					for(i = 0; i < count; i++){
 						if(strcmp(vetorPrim[i].chave, chBusca) == 0){
 							enc = 1;
@@ -455,15 +481,22 @@ int main(){
 				fseek(matches, 0L, SEEK_SET);
 				
 				for(i = 0; i < tam; i += 192){
-					//TODO code ...
+					for(j = 0; j < 192; j++){
+						str[j] = fgetc(matches);
+					}
+					str[192] = '\0';
+					if(str[0] == '*' && str[1] == '|'){
+						//Remocao de fato
+						//...
+					}
 				}
 				
 				break;
 			//Finaliza operacao
 			case 7:
-				free(vetorPrim);
-				free(vetorWinner);
-				free(vetorMVP);
+				//free(vetorPrim);
+				//free(vetorWinner);
+				//free(vetorMVP);
 				fclose(iprim);
 				fclose(iwinner);	
 				fclose(imvp);
@@ -621,4 +654,52 @@ void criaIndiceWin(FILE *f, Registro *v){
 
 void criaIndiceMVP(FILE *f, Registro *v){
 
+}
+
+int chaveJaExiste(Registro *v, char *ch, int k){
+	int i;
+	for(i = 0; i < k; i++){
+		if(strcmp(ch, v[i].chave) == 0) return 1;
+	}
+	
+	return 0;
+}
+
+void geraIndice(char *rgStr, Registro *v1, Registro *v2, Registro *v3, int k){
+	char aux[192], *ch, *c1, *w, *m;
+	int i = 0;
+	
+	ch = malloc(sizeof(char) * 39 + 1);
+	if(ch == NULL) exit(1);
+	
+	c1 = malloc(sizeof(char) * 39 + 1);
+	if(c1 == NULL) exit(1);
+	
+	w = malloc(sizeof(char) * 39 + 1);
+	if(w == NULL) exit(1);
+	
+	m = malloc(sizeof(char) * 39 + 1);
+	if(m == NULL) exit(1);
+	
+	while(rgStr[i] != '#') aux[i++] = rgStr[i];
+	aux[i] = '\0';
+	
+	ch = strtok(aux, "@");
+	c1 = strtok(NULL, "@");
+	c1 = strtok(NULL, "@");
+	c1 = strtok(NULL, "@");
+	c1 = strtok(NULL, "@");
+	w = strtok(NULL, "@");
+	c1 = strtok(NULL, "@");
+	c1 = strtok(NULL, "@");
+	m = strtok(NULL, "@");
+	
+	strcpy(v1[k].chave, ch);
+	strcpy(v2[k].chave, ch);
+	strcpy(v3[k].chave, ch);
+	
+	free(ch);
+	free(c1);
+	free(w);
+	free(m);
 }
