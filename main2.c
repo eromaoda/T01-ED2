@@ -479,26 +479,22 @@ int main(){
 					
 					//Busca pela chave primaria
 					if(op2 == 1){
-						int rrnBusca, enc = 0;
-						char *aux, c;
-						char *imprNA, *imprNV, *imprNW;
-						char *imprPA, *imprPV, *ch;
-						char *imprData, *imprDur, *imprMVP;
-						int j;
+						int rrnBusca, enc = 0, j;
+						char aux[192], dados[192];
 				
 						qsort(vetorPrim, count + 1, sizeof(char), comp);
-							
+						//printf("hell\n");	
 						for(i = 0; i < count; i++){
-							//pega todo o registro do arquivo de dados
-							if(vetorPrim[i].rrn != -1){
-								fseek(matches, vetorPrim[i].rrn, SEEK_SET);
-								for(j = 0; j < 192; j++){
-									c = fgetc(matches);
-									if(c == '#') break;
-									else aux[i] = c;
-								}
+							if(vetorPrim[i].rrn != -1) rrnBusca = vetorPrim[i].rrn;
+							fseek(matches, rrnBusca, SEEK_SET);
+							for(j = 0; j < 192; j++) dados[j] = fgetc(matches);
+							j = 0;
+							while(dados[j] != '#'){
+								aux[j] = dados[j];
+								j++;
 							}
-						
+							aux[j] = '\0';
+							
 							//tratamento dos dados para impressao
 							printf("%s\n", strtok(aux, "@"));
 							printf("%s\n", strtok(NULL, "@"));
@@ -509,6 +505,7 @@ int main(){
 							printf("%s\n", strtok(NULL, "@"));
 							printf("%s\n", strtok(NULL, "@"));
 							printf("%s\n", strtok(NULL, "@"));
+							printf("\n");
 						}
 					//Busca pelo nome da equipe vencedora
 					}else if(op2 == 2){
