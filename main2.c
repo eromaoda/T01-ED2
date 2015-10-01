@@ -145,27 +145,28 @@ int main(){
 			//printf("w = %s\nm = %s\n", w, m);
 			int k;
 			//strcpy(vetorPrim[count].chave, ch);
-			if(arqVazio(iprim) == 0){
+			//if(arqVazio(iprim) == 0){
 				
 				//printf("ch = %s\ntam ch = %d\n", ch, strlen(ch));
 				for(k = 0; k < strlen(ch); k++) vetorPrim[count].chave[k] = ch[k];
 				vetorPrim[count].rrn = i;
-			}
+				printf("vet prim ch = %s\nvet prim rrn = %d\n", vetorPrim[count].chave, vetorPrim[count].rrn);
+			//}
 			
-			if(arqVazio(iwinner) == 0){
+			//if(arqVazio(iwinner) == 0){
 				//strcpy(vetorWinner[count].chave, ch);
 				for(k = 0; k < strlen(ch); k++) vetorWinner[count].chave[k] = ch[k];
 				for(k = 0; k < strlen(w); k++) vetorWinner[count].winner[k] = w[k];
-			}
+			//}
 			//strcpy(vetorMVP[count].chave, ch);
 			//printf("chave mvp = %s\n", ch);
-			if(arqVazio(imvp) == 0){
+			//if(arqVazio(imvp) == 0){
 				for(k = 0; k < strlen(ch); k++) vetorMVP[count].chave[k] = ch[k];
 			//printf("chave mvp no vet = %s\n", vetorMVP[count].chave);
 			//for(k = 0; k < strlen(w); k++) vetorWinner[count].winner[k] = w[k];
 			//printf("mvp = %s\n", m);
 				for(k = 0; k < strlen(m); k++) vetorMVP[count].mvp[k] = m[k];
-			}
+			//}
 			/*free(ch);
 			free(c1);
 			free(w);
@@ -180,7 +181,7 @@ int main(){
 		//for(i = 0; i < count; i++) printf("%s %d\n", vetorPrim[i].chave, vetorPrim[i].rrn);
 	}else printf("arquivo de dados vazio !\n");
 	fseek(matches, 0L, SEEK_SET);
-	
+	fclose(matches);
 	while(1){
 		printMenu();
 		scanf("%d", &op);
@@ -189,6 +190,10 @@ int main(){
 		switch(op){
 			//Inserir novo registro
 			case 1:
+				matches = fopen("matches.dat", "r+");
+				if(matches == NULL){
+					matches = fopen("matches.dat", "w+");
+				}
 				scanf("%[^\n]s", nomeAzul);
 				getchar();
 				
@@ -293,11 +298,15 @@ int main(){
 					RRN += 192;
 					count++;
 				}
-				
+				fclose(matches);
 				break;
 			//Remover registro
 			case 2:
 				//int encontrado = 0, rrnDeletar, i;
+				matches = fopen("matches.dat", "r+");
+				if(matches == NULL){
+					matches = fopen("matches.dat", "w+");
+				}
 				scanf("%[^\n]s", chBusca);
 				getchar();
 				
@@ -317,39 +326,60 @@ int main(){
 				}
 				
 				if(encontrado == 0) printf("Registro nao encontrado!\n");
-				
+				fclose(matches);
 				break;
 			//Alterar registro
 			case 3:
-				scanf("%[^\n]", chBusca);
-				int enc = 0, rrnBusca;
+				matches = fopen("matches.dat", "r+");
+				if(matches == NULL){
+					matches = fopen("matches.dat", "w+");
+				}
+				
+				scanf("%[^\n]s", chBusca);
+				getchar();
+				int enc = 0, rrnBusca, contador = 0;
 				char novaDur[5];
 				
 				for(i = 0; i < count; i++){
 					if(strcmp(vetorPrim[i].chave, chBusca) == 0){
 						enc = 1;
 						rrnBusca = vetorPrim[i].rrn;
-						scanf("%[^\n]s", novaDur);
-						getchar();
-						while(verificaDuracao(novaDur) != 1){
-							printf("Campo invalido ! Tente novamente: ");
-							scanf("%[^\n]s", novaDur);
-							getchar();
-						}
-		
-						//substituir a duracao com base no rrn
-						//como faz ?
-						
-						
 						break;
 					}
 				}
 				
-				if(enc == 0) printf("Registro nao encontrado!\n");
+				//Se o registro for encontrado no arquivo de dados
+				if(enc == 1){
+					scanf("%[^\n]s", novaDur);
+					getchar();
+					while(verificaDuracao(novaDur) != 1){
+						printf("Campo invalido ! Tente novamente: ");
+						scanf("%[^\n]s", novaDur);
+						getchar();
+					}
+					fseek(matches, rrnBusca, SEEK_SET);
+					//Conta o numero de @'s ate chegar no campo de duracao da partida
+					while(contador != 4){
+						char c = fgetc(matches);
+						if(c == '@') contador++;
+					}
+					//Insere os novos valores da duracao
+					fputc(novaDur[0], matches);
+					fputc(novaDur[1], matches);
+					fputc(novaDur[2], matches);
+					fputc(novaDur[3], matches);
+					fputc(novaDur[4], matches);
+				}else printf("Registro nao encontrado!\n");
+				
+				fclose(matches);
 				
 				break;
 			//Busca registro
 			case 4:
+				matches = fopen("matches.dat", "r+");
+				if(matches == NULL){
+					matches = fopen("matches.dat", "w+");
+				}
 				//char dadosArq[192];
 				//int op2, enc = 0, i;
 				printf("1. Busca por Codigo\n2. Busca por Nome da Equipe Vencedora\n3. Busca por Apelido do MVP\n");
@@ -496,10 +526,14 @@ int main(){
 					}
 					if(enc == 0) printf("Registro nao encontrado!\n");						
 				}else printf("Opcao invalida!\n");
-				
+				fclose(matches);
 				break;
 			//Lista registros
 			case 5:
+				matches = fopen("matches.dat", "r+");
+				if(matches == NULL){
+					matches = fopen("matches.dat", "w+");
+				}
 				if(arqVazio(matches) == 1) printf("Arquivo vazio!\n");
 				else{
 					printf("1. Listagem por codigo\n2. Listagem por nome da equipe vencedora\n3. Listagem por apelido do MVP\n");
@@ -514,7 +548,7 @@ int main(){
 						
 						for(i = 0; i < count; i++) vAux[i] = vetorPrim[i];
 						
-						qsort(vAux, count + 1, sizeof(char), comp);
+						qsort(vAux, count, sizeof(char), comp);
 						//printf("hell\n");	
 						for(i = 0; i < count; i++){
 							if(vAux[i].rrn != -1){
@@ -585,20 +619,17 @@ int main(){
 						char chav[8], aux[192], dados[192], c;
 						int r, x, j;
 						
-						qsort(vetorMVP, count + 1, sizeof(char), comp3);
+						qsort(vetorMVP, count + 1, sizeof(char), comp2);
 						
 						for(i = 0; i < count; i++){
-							vetorMVP[i].chave[8] = '\0';
 							strcpy(chav, vetorMVP[i].chave);
 							for(j = 0; j < count; j++){
-								if(strcmp(chav, vetorPrim[j].chave) == 0){
-									r = vetorPrim[j].rrn;
-									break;
-								}
-							}
+								if(strcmp(chav, vetorPrim[j].chave) == 0) r = vetorPrim[j].rrn;
 								if(r != -1){
 									fseek(matches, r, SEEK_SET);
-									for(x = 0; x < 192; x++) dados[x] = fgetc(matches);
+									for(x = 0; x < 192; x++){
+										dados[x] = fgetc(matches);
+									}
 									x = 0;
 									while(dados[x] != '#'){
 										aux[x] = dados[x];
@@ -618,14 +649,17 @@ int main(){
 									printf("%s\n", strtok(NULL, "@"));
 									printf("\n");
 								}
-								fseek(matches, 0L, SEEK_SET);
-							//}
+							}
 						}
+						fseek(matches, 0L, SEEK_SET);
 					}else printf("Opcao invalida!\n");
 					
 					fseek(matches, 0L, SEEK_SET);
 				}
-				
+				matches = fopen("matches.dat", "r+");
+				if(matches == NULL){
+					matches = fopen("matches.dat", "w+");
+				}
 				break;
 			//Libera memoria
 			case 6:
@@ -653,7 +687,7 @@ int main(){
 				fclose(iprim);
 				fclose(iwinner);	
 				fclose(imvp);
-				fclose(matches);
+				//fclose(matches);
 				return 0;
 			default:
 				break;
@@ -768,7 +802,10 @@ int comp(const void *a, const void *b){
 	Registro *aux1 = (Registro *) a;
 	Registro *aux2 = (Registro *) b;
 	
-	return (strcmp(aux1->chave, aux2->chave));
+	if(strcmp(aux1->chave, aux2->chave) == 0) return 0;
+	if(strcmp(aux1->chave, aux2->chave) > 0) return 1;
+	if(strcmp(aux1->chave, aux2->chave) < 0) return -1;
+	//return (strcmp(aux1->chave, aux2->chave));
 }
 
 int comp2(const void *a, const void *b){
