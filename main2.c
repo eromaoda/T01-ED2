@@ -128,23 +128,29 @@ int main(){
 			m = strtok(NULL, "@");
 			
 			//printf("w = %s\nm = %s\n", w, m);
-			
-			//strcpy(vetorPrim[count].chave, ch);
 			int k;
-			//printf("ch = %s\ntam ch = %d\n", ch, strlen(ch));
-			for(k = 0; k < strlen(ch); k++) vetorPrim[count].chave[k] = ch[k];
+			//strcpy(vetorPrim[count].chave, ch);
+			if(arqVazio(iprim) == 0){
+				
+				//printf("ch = %s\ntam ch = %d\n", ch, strlen(ch));
+				for(k = 0; k < strlen(ch); k++) vetorPrim[count].chave[k] = ch[k];
+				vetorPrim[count].rrn = i;
+			}
 			
-			//strcpy(vetorWinner[count].chave, ch);
-			for(k = 0; k < strlen(ch); k++) vetorWinner[count].chave[k] = ch[k];
-			
+			if(arqVazio(iwinner) == 0){
+				//strcpy(vetorWinner[count].chave, ch);
+				for(k = 0; k < strlen(ch); k++) vetorWinner[count].chave[k] = ch[k];
+				for(k = 0; k < strlen(w); k++) vetorWinner[count].winner[k] = w[k];
+			}
 			//strcpy(vetorMVP[count].chave, ch);
 			//printf("chave mvp = %s\n", ch);
-			for(k = 0; k < strlen(ch); k++) vetorMVP[count].chave[k] = ch[k];
+			if(arqVazio(imvp) == 0){
+				for(k = 0; k < strlen(ch); k++) vetorMVP[count].chave[k] = ch[k];
 			//printf("chave mvp no vet = %s\n", vetorMVP[count].chave);
-			for(k = 0; k < strlen(w); k++) vetorWinner[count].winner[k] = w[k];
+			//for(k = 0; k < strlen(w); k++) vetorWinner[count].winner[k] = w[k];
 			//printf("mvp = %s\n", m);
-			for(k = 0; k < strlen(m); k++) vetorMVP[count].mvp[k] = m[k];
-			
+				for(k = 0; k < strlen(m); k++) vetorMVP[count].mvp[k] = m[k];
+			}
 			/*free(ch);
 			free(c1);
 			free(w);
@@ -159,6 +165,7 @@ int main(){
 		//for(i = 0; i < count; i++) printf("%s %d\n", vetorPrim[i].chave, vetorPrim[i].rrn);
 	}else printf("arquivo de dados vazio !\n");
 	fseek(matches, 0L, SEEK_SET);
+	
 	while(1){
 		printMenu();
 		scanf("%d", &op);
@@ -288,8 +295,8 @@ int main(){
 						vetorPrim[i].chave[1] = '|';
 						fseek(matches, vetorPrim[count].rrn, SEEK_SET);
 						for(j = 0; j < 2; j++){
-							if(j == 0) fputs("*", matches);
-							else if(j == 1) fputs("|", matches);
+							if(j == 0) fputc('*', matches);
+							else if(j == 1) fputc('|', matches);
 						}
 						vetorPrim[count].rrn = -1;
 					}
