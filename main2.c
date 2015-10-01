@@ -48,6 +48,9 @@ int comp3(const void *a, const void *b);
 int chaveJaExiste(Registro *v, char *ch, int k);
 void geraIndice(char *rgStr, Registro *v1, Registro *v2, Registro *v3, int k);
 void atualizaDados(Registro *v, FILE *f);
+void ordenaPorChave(Registro *v, int n);
+void ordenaPorVenc(Registro *v, int n);
+void ordenaPorMVP(Registro *v, int n);
 
 int RRN = 0;
 int count = 0;
@@ -91,7 +94,6 @@ int main(){
 	fseek(matches, 0L, SEEK_END);
 	int fileLen = ftell(matches);
 	fseek(matches, 0L, SEEK_SET);
-	//printf("t = %d\n", arqVazio(iprim));
 	
 	//Se ja houver registros no matches.dat, preenche os vetores de indice com as chaves
 	if(fileLen != 0){
@@ -131,8 +133,6 @@ int main(){
 			}
 			auxiliar[x] = '\0';
 			
-			//printf("aux = %s\n", auxiliar);
-			
 			ch = strtok(auxiliar, "@");
 			c1 = strtok(NULL, "@");
 			c1 = strtok(NULL, "@");
@@ -143,7 +143,6 @@ int main(){
 			c1 = strtok(NULL, "@");
 			m = strtok(NULL, "@");
 			
-			//printf("w = %s\nm = %s\n", w, m);
 			int k;
 			for(k = 0; k < strlen(ch); k++) vetorPrim[count].chave[k] = ch[k];
 			vetorPrim[count].rrn = i;
@@ -159,6 +158,7 @@ int main(){
 	}else printf("Arquivo de dados vazio!\n");
 	fseek(matches, 0L, SEEK_SET);
 	fclose(matches);
+	
 	while(1){
 		printMenu();
 		scanf("%d", &op);
@@ -243,17 +243,14 @@ int main(){
 					insereArq(matches, nomeAzul, nomeVermelho, data, duracao, nomeWinner, placarAzul, placarVermelho, apelidoMVP, chave);
 					
 					//Passar a chave e o RRN da partida pro vetor primario
-					//vetorPrim = realloc(vetorPrim, sizeof(Registro) * (count + 1));
 					strcpy(vetorPrim[count].chave, chave);
 					vetorPrim[count].rrn = RRN;
 					
 					//Passando o nome do vencedor e a chave primaria para o vetor de vencedores
-					//vetorWinner = realloc(vetorWinner, sizeof(Registro) * (count + 1));
 					strcpy(vetorWinner[count].winner, nomeWinner);
 					strcpy(vetorWinner[count].chave, chave);
 					
 					//Passando o apelido do MVP e a chave primaria para o vetor dos MVP's
-					//vetorMVP = realloc(vetorMVP, sizeof(Registro) * (count + 1));
 					strcpy(vetorMVP[count].mvp, nomeWinner);
 					strcpy(vetorMVP[count].chave, chave);
 					
@@ -525,7 +522,8 @@ int main(){
 						
 						for(i = 0; i < count; i++) vAux[i] = vetorPrim[i];
 						
-						qsort(vAux, count, sizeof(char), comp);
+						//qsort(vAux, count, sizeof(char), comp);
+						ordenaPorChave(vAux, count);
 						//printf("hell\n");	
 						for(i = 0; i < count; i++){
 							if(vAux[i].rrn != -1){
@@ -559,10 +557,15 @@ int main(){
 						char chav[8], aux[192], dados[192], c;
 						int r, x, j;
 						
-						qsort(vetorWinner, count + 1, sizeof(char), comp2);
+						for(i = 0; i < count; i++) vAux[i] = vetorWinner[i];
+						
+						//qsort(vetorWinner, count + 1, sizeof(char), comp2);
+						ordenaPorVenc(vAux, count);
+						for(i = 0; i < count; i++) printf("nome win = %s\n", vAux[i].winner);
+						printf("\n");
 						
 						for(i = 0; i < count; i++){
-							strcpy(chav, vetorWinner[i].chave);
+							strcpy(chav, vAux[i].chave);
 							for(j = 0; j < count; j++){
 								if(strcmp(chav, vetorPrim[j].chave) == 0) r = vetorPrim[j].rrn;
 								if(r != -1){
@@ -576,7 +579,7 @@ int main(){
 										x++;
 									}
 									aux[x] = '\0';
-									
+									}}
 									//tratamento dos dados para impressao
 									printf("%s\n", strtok(aux, "@"));
 									printf("%s\n", strtok(NULL, "@"));
@@ -588,18 +591,20 @@ int main(){
 									printf("%s\n", strtok(NULL, "@"));
 									printf("%s\n", strtok(NULL, "@"));
 									printf("\n");
-								}
+								
 							}
-						}
+						
 						fseek(matches, 0L, SEEK_SET);
 					}else if(op2 == 3){
 						char chav[8], aux[192], dados[192], c;
 						int r, x, j;
-						
-						qsort(vetorMVP, count + 1, sizeof(char), comp2);
-						
+						for(i = 0; i < count; i++) vAux[i] = vetorMVP[i];
+						//qsort(vetorMVP, count + 1, sizeof(char), comp2);
+						ordenaPorMVP(vAux, count);
+
 						for(i = 0; i < count; i++){
-							strcpy(chav, vetorMVP[i].chave);
+							vAux[i].chave[8] = '\0';
+							strcpy(chav, vAux[i].chave);
 							for(j = 0; j < count; j++){
 								if(strcmp(chav, vetorPrim[j].chave) == 0) r = vetorPrim[j].rrn;
 								if(r != -1){
@@ -613,7 +618,8 @@ int main(){
 										x++;
 									}
 									aux[x] = '\0';
-									
+								}
+							}
 									//tratamento dos dados para impressao
 									printf("%s\n", strtok(aux, "@"));
 									printf("%s\n", strtok(NULL, "@"));
@@ -625,18 +631,20 @@ int main(){
 									printf("%s\n", strtok(NULL, "@"));
 									printf("%s\n", strtok(NULL, "@"));
 									printf("\n");
-								}
-							}
+								//}
+							//}
 						}
 						fseek(matches, 0L, SEEK_SET);
 					}else printf("Opcao invalida!\n");
 					
 					fseek(matches, 0L, SEEK_SET);
 				}
-				matches = fopen("matches.dat", "r+");
+				/*matches = fopen("matches.dat", "r+");
 				if(matches == NULL){
 					matches = fopen("matches.dat", "w+");
-				}
+				}*/
+				
+				fclose(matches);
 				
 				break;
 			//Libera memoria
@@ -909,4 +917,47 @@ void geraIndice(char *rgStr, Registro *v1, Registro *v2, Registro *v3, int k){
 	free(c1);
 	free(w);
 	free(m);
+}
+
+//As funcoes de ordenacao abaixo sao implementacoes do algoritmo de Selection Sort
+void ordenaPorChave(Registro *v, int n){
+	int i,j, min;
+	Registro aux;
+	for(i = 0; i < n; i++){
+		min = i;
+		for(j = i + 1; j < n; j++){
+			if(strcmp(v[j].chave, v[min].chave) < 0) min = j;
+		}
+		aux = v[i];
+		v[i] = v[min];
+		v[min] = aux;
+	}
+}
+
+void ordenaPorVenc(Registro *v, int n){
+	int i,j, min;
+	Registro aux;
+	for(i = 0; i < n; i++){
+		min = i;
+		for(j = i + 1; j < n; j++){
+			if(strcmp(v[j].winner, v[min].winner) < 0) min = j;
+		}
+		aux = v[i];
+		v[i] = v[min];
+		v[min] = aux;
+	}
+}
+
+void ordenaPorMVP(Registro *v, int n){
+	int i,j, min;
+	Registro aux;
+	for(i = 0; i < n; i++){
+		min = i;
+		for(j = i + 1; j < n; j++){
+			if(strcmp(v[j].mvp, v[min].mvp) < 0) min = j;
+		}
+		aux = v[i];
+		v[i] = v[min];
+		v[min] = aux;
+	}
 }
