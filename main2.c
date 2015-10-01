@@ -65,6 +65,7 @@ int main(){
 	char nomeWinner[39], apelidoMVP[39];
 	char placarAzul[2], placarVermelho[2];
 	FILE *matches, *iprim, *isec, *iwinner, *imvp;
+	FILE *auxFile;
 	Registro vetorPrim[TOT], vetorWinner[TOT], vetorMVP[TOT];
 	
 	matches = fopen("matches.dat", "r+");
@@ -144,42 +145,18 @@ int main(){
 			
 			//printf("w = %s\nm = %s\n", w, m);
 			int k;
-			//strcpy(vetorPrim[count].chave, ch);
-			//if(arqVazio(iprim) == 0){
-				
-				//printf("ch = %s\ntam ch = %d\n", ch, strlen(ch));
-				for(k = 0; k < strlen(ch); k++) vetorPrim[count].chave[k] = ch[k];
-				vetorPrim[count].rrn = i;
-				printf("vet prim ch = %s\nvet prim rrn = %d\n", vetorPrim[count].chave, vetorPrim[count].rrn);
-			//}
-			
-			//if(arqVazio(iwinner) == 0){
-				//strcpy(vetorWinner[count].chave, ch);
-				for(k = 0; k < strlen(ch); k++) vetorWinner[count].chave[k] = ch[k];
-				for(k = 0; k < strlen(w); k++) vetorWinner[count].winner[k] = w[k];
-			//}
-			//strcpy(vetorMVP[count].chave, ch);
-			//printf("chave mvp = %s\n", ch);
-			//if(arqVazio(imvp) == 0){
-				for(k = 0; k < strlen(ch); k++) vetorMVP[count].chave[k] = ch[k];
-			//printf("chave mvp no vet = %s\n", vetorMVP[count].chave);
-			//for(k = 0; k < strlen(w); k++) vetorWinner[count].winner[k] = w[k];
-			//printf("mvp = %s\n", m);
-				for(k = 0; k < strlen(m); k++) vetorMVP[count].mvp[k] = m[k];
-			//}
-			/*free(ch);
-			free(c1);
-			free(w);
-			free(m);*/
-			//printf("caca\n");
+			for(k = 0; k < strlen(ch); k++) vetorPrim[count].chave[k] = ch[k];
 			vetorPrim[count].rrn = i;
-			//strcpy(vetorWinner[count].chave, vetorPrim[count].chave);
-			//strcpy(vetorMVP[count].chave, vetorPrim[count].chave);
+			
+			for(k = 0; k < strlen(ch); k++) vetorWinner[count].chave[k] = ch[k];
+			for(k = 0; k < strlen(w); k++) vetorWinner[count].winner[k] = w[k];
+			for(k = 0; k < strlen(ch); k++) vetorMVP[count].chave[k] = ch[k];
+			for(k = 0; k < strlen(m); k++) vetorMVP[count].mvp[k] = m[k];
+
+			vetorPrim[count].rrn = i;
 			count++;	
 		}
-		//printf("count = %d\n", count);
-		//for(i = 0; i < count; i++) printf("%s %d\n", vetorPrim[i].chave, vetorPrim[i].rrn);
-	}else printf("arquivo de dados vazio !\n");
+	}else printf("Arquivo de dados vazio!\n");
 	fseek(matches, 0L, SEEK_SET);
 	fclose(matches);
 	while(1){
@@ -534,7 +511,7 @@ int main(){
 				if(matches == NULL){
 					matches = fopen("matches.dat", "w+");
 				}
-				if(arqVazio(matches) == 1) printf("Arquivo vazio!\n");
+				if(arqVazio(matches) == 0) printf("Arquivo vazio!\n");
 				else{
 					printf("1. Listagem por codigo\n2. Listagem por nome da equipe vencedora\n3. Listagem por apelido do MVP\n");
 					scanf("%d", &op2);
@@ -660,23 +637,65 @@ int main(){
 				if(matches == NULL){
 					matches = fopen("matches.dat", "w+");
 				}
+				
 				break;
 			//Libera memoria
 			case 6:
+				matches = fopen("matches.dat", "r+");
+				if(matches == NULL){
+					matches = fopen("matches.dat", "w+");
+				}
+				
+				auxFile = fopen("auxfile.dat", "a+");
+
 				//Verifica quem esta marcado para remocao (*|) e finaliza a op
-				/*fseek(matches, 0L, SEEK_END);
+				fseek(matches, 0L, SEEK_END);
 				tam = ftell(matches);
 				fseek(matches, 0L, SEEK_SET);
 				
 				for(i = 0; i < tam; i += 192){
+					int cont = 0;
+					char c;
+					
 					fseek(matches, i, SEEK_SET);
-					for(j = 0; j < 192; j++){
-						dadosArq[j] = fgetc(matches);
+					
+					c = fgetc(matches);
+					if(c == '*') cont++;
+					c = fgetc(matches);
+					if(c == '|') cont++;
+					
+					fseek(matches, i, SEEK_SET);
+					
+					if(cont != 2){
+						char dadosAux[192];
+						int j;
+						for(j = 0; j < 192; j++) dadosAux[j] = fgetc(matches);
+						dadosAux[192] = '\0';
+						j = 0;
+						fputs(dadosAux, auxFile);
+						fseek(auxFile, (i * 192), SEEK_SET);
 					}
-					if(dadosArq[0] == '*' && dadosArq[1] == '|'){
-						for(j = 0; j < 192; j++) fputs("", matches);
-					}
-				}*/
+				}
+				
+				fclose(matches);
+				remove("matches.dat");
+				
+				matches = fopen("matches.dat", "r+");
+				if(matches == NULL) matches = fopen("matches.dat", "w+");
+				
+				for(i = 0; i < (arqVazio(auxFile) / 192); i++){
+					fseek(auxFile, (i * 192), SEEK_SET);
+					int j;
+					for(j = 0; j < 192; j++) str[j] = fgetc(auxFile);
+					str[192] = '\0';
+					fseek(matches, (i * 192), SEEK_SET);
+					fputs(str, matches);
+				}
+				
+				fclose(auxFile);
+				remove("auxfile.dat");
+				
+				fclose(matches);
 				
 				break;
 			//Finaliza operacao
@@ -687,7 +706,6 @@ int main(){
 				fclose(iprim);
 				fclose(iwinner);	
 				fclose(imvp);
-				//fclose(matches);
 				return 0;
 			default:
 				break;
