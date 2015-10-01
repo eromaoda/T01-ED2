@@ -67,10 +67,25 @@ int main(){
 	FILE *matches, *iprim, *isec, *iwinner, *imvp;
 	Registro vetorPrim[TOT], vetorWinner[TOT], vetorMVP[TOT];
 	
-	matches = fopen("matches.dat", "a+");
-	iprim = fopen("iprimary.idx", "a+");
-	iwinner = fopen("iwinner.idx", "a+");
-	imvp = fopen("imvp.idx", "a+");
+	matches = fopen("matches.dat", "r+");
+	if(matches == NULL){
+		matches = fopen("matches.dat", "w+");
+	}
+	
+	iprim = fopen("iprimary.idx", "r+");
+	if(matches == NULL){
+		iprim = fopen("iprim.idx", "w+");
+	}
+	
+	iwinner = fopen("iwinner.idx", "r+");
+	if(iwinner == NULL){
+		iwinner = fopen("iwinner.idx", "w+");
+	}
+	
+	imvp = fopen("imvp.idx", "r+");
+	if(imvp == NULL){
+		imvp = fopen("imvp.idx", "w+");
+	}
 	
 	fseek(matches, 0L, SEEK_END);
 	int fileLen = ftell(matches);
@@ -293,12 +308,11 @@ int main(){
 						//vetorPrim[i].rrn = -1;
 						vetorPrim[i].chave[0] = '*';
 						vetorPrim[i].chave[1] = '|';
-						fseek(matches, vetorPrim[count].rrn, SEEK_SET);
-						for(j = 0; j < 2; j++){
-							if(j == 0) fputc('*', matches);
-							else if(j == 1) fputc('|', matches);
-						}
-						vetorPrim[count].rrn = -1;
+						printf("rrn delete = %d\n", rrnDeletar);
+						fseek(matches, rrnDeletar, SEEK_SET);
+						fputc('*', matches);
+						fputc('|', matches);
+						vetorPrim[i].rrn = -1;
 					}
 				}
 				
@@ -524,6 +538,7 @@ int main(){
 								printf("%s\n", strtok(NULL, "@"));
 								printf("%s\n", strtok(NULL, "@"));
 								printf("%s\n", strtok(NULL, "@"));
+								printf("rrn b = %d\n", rrnBusca);
 								printf("\n");
 							}
 						}
@@ -724,7 +739,7 @@ int verificaVencedor(char *nomeAzul, char *nomeVermelho, char *winner, char *pla
 void insereArq(FILE *f, char *na, char *nv, char *data, char *dur, char *win, char *pla, char *plv, char *mvp, char *chave){
 	char aux[MAX];
 	int i;
-	
+	fseek(f, 0L, SEEK_END);
 	//Passando os valores formatados para uma srting auxiliar,
 	//e a imprimindo no arquivo
 	sprintf(aux, "%s@%s@%s@%s@%s@%s@%s@%s@%s@", chave, na, nv, data, dur, win, pla, plv, mvp);
@@ -732,6 +747,7 @@ void insereArq(FILE *f, char *na, char *nv, char *data, char *dur, char *win, ch
 	
 	//Comletando com #'s
 	for(i = 0; i < (192 - strlen(aux)); i++) fprintf(f, "#");
+	fseek(f, 0L, SEEK_SET);
 }
 
 int arqVazio(FILE *f){
