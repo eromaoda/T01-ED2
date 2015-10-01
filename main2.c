@@ -3,7 +3,7 @@
  * Estruturas de Dados 2 - 2015
  * Trabalho 01
  * Eduardo Romao da Rocha - 408468
- * Matheus Gomes Barbieri - 
+ * Matheus Gomes Barbieri - 408344
  * */
 
 #include<stdio.h>
@@ -47,6 +47,7 @@ int comp2(const void *a, const void *b);
 int comp3(const void *a, const void *b);
 int chaveJaExiste(Registro *v, char *ch, int k);
 void geraIndice(char *rgStr, Registro *v1, Registro *v2, Registro *v3, int k);
+void atualizaDados(Registro *v, FILE *f);
 
 int RRN = 0;
 int count = 0;
@@ -74,7 +75,7 @@ int main(){
 	fseek(matches, 0L, SEEK_END);
 	int fileLen = ftell(matches);
 	fseek(matches, 0L, SEEK_SET);
-	//printf("t = %d\n", fileLen);
+	//printf("t = %d\n", arqVazio(iprim));
 	
 	//Se ja houver registros no matches.dat, preenche os vetores de indice com as chaves
 	if(fileLen != 0){
@@ -282,9 +283,15 @@ int main(){
 					if(strcmp(vetorPrim[i].chave, chBusca) == 0){
 						encontrado = 1;
 						rrnDeletar = vetorPrim[i].rrn;
-						vetorPrim[i].rrn = -1;
+						//vetorPrim[i].rrn = -1;
 						vetorPrim[i].chave[0] = '*';
 						vetorPrim[i].chave[1] = '|';
+						fseek(matches, vetorPrim[count].rrn, SEEK_SET);
+						for(j = 0; j < 2; j++){
+							if(j == 0) fputs("*", matches);
+							else if(j == 1) fputs("|", matches);
+						}
+						vetorPrim[count].rrn = -1;
 					}
 				}
 				
@@ -476,40 +483,47 @@ int main(){
 				else{
 					printf("1. Listagem por codigo\n2. Listagem por nome da equipe vencedora\n3. Listagem por apelido do MVP\n");
 					scanf("%d", &op2);
-					
+					Registro *vAux;
+					vAux = malloc(sizeof(Registro) * count);
+					if(vAux == NULL) exit(1);
 					//Busca pela chave primaria
 					if(op2 == 1){
 						int rrnBusca, enc = 0, j;
 						char aux[192], dados[192];
-				
-						qsort(vetorPrim, count + 1, sizeof(char), comp);
+						
+						for(i = 0; i < count; i++) vAux[i] = vetorPrim[i];
+						
+						qsort(vAux, count + 1, sizeof(char), comp);
 						//printf("hell\n");	
 						for(i = 0; i < count; i++){
-							if(vetorPrim[i].rrn != -1) rrnBusca = vetorPrim[i].rrn;
-							fseek(matches, rrnBusca, SEEK_SET);
-							for(j = 0; j < 192; j++) dados[j] = fgetc(matches);
-							j = 0;
-							while(dados[j] != '#'){
-								aux[j] = dados[j];
-								j++;
+							if(vAux[i].rrn != -1){
+								rrnBusca = vAux[i].rrn;
+								fseek(matches, rrnBusca, SEEK_SET);
+								for(j = 0; j < 192; j++) dados[j] = fgetc(matches);
+								j = 0;
+								while(dados[j] != '#'){
+									aux[j] = dados[j];
+									j++;
+								}
+								aux[j] = '\0';
+								
+								//tratamento dos dados para impressao
+								printf("%s\n", strtok(aux, "@"));
+								printf("%s\n", strtok(NULL, "@"));
+								printf("%s\n", strtok(NULL, "@"));
+								printf("%s\n", strtok(NULL, "@"));
+								printf("%s\n", strtok(NULL, "@"));
+								printf("%s\n", strtok(NULL, "@"));
+								printf("%s\n", strtok(NULL, "@"));
+								printf("%s\n", strtok(NULL, "@"));
+								printf("%s\n", strtok(NULL, "@"));
+								printf("\n");
 							}
-							aux[j] = '\0';
-							
-							//tratamento dos dados para impressao
-							printf("%s\n", strtok(aux, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("\n");
 						}
+						fseek(matches, 0L, SEEK_SET);
 					//Busca pelo nome da equipe vencedora
 					}else if(op2 == 2){
-						char chav[8], aux[192], c;
+						char chav[8], aux[192], dados[192], c;
 						int r, x, j;
 						
 						qsort(vetorWinner, count + 1, sizeof(char), comp2);
@@ -521,48 +535,69 @@ int main(){
 								if(r != -1){
 									fseek(matches, r, SEEK_SET);
 									for(x = 0; x < 192; x++){
-										c = fgetc(matches);
-										if(c != '#') aux[x] = c;
-										else break;
+										dados[x] = fgetc(matches);
 									}
-									aux[192] = '\0';
 									x = 0;
-									while(aux[x] != '\0'){
-										if(aux[x] != '@') printf("%c", aux[x]);
-										else printf("\n");
+									while(dados[x] != '#'){
+										aux[x] = dados[x];
 										x++;
 									}
+									aux[x] = '\0';
+									
+									//tratamento dos dados para impressao
+									printf("%s\n", strtok(aux, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
 									printf("\n");
 								}
 							}
 						}
+						fseek(matches, 0L, SEEK_SET);
 					}else if(op2 == 3){
-						char chav[8], aux[192], c;
+						char chav[8], aux[192], dados[192], c;
 						int r, x, j;
 						
 						qsort(vetorMVP, count + 1, sizeof(char), comp3);
 						
 						for(i = 0; i < count; i++){
+							vetorMVP[i].chave[8] = '\0';
 							strcpy(chav, vetorMVP[i].chave);
 							for(j = 0; j < count; j++){
-								if(strcmp(chav, vetorPrim[j].chave) == 0) r = vetorPrim[j].rrn;
-								if(r != -1){
-									fseek(matches, r, SEEK_SET);
-									for(x = 0; x < 192; x++){
-										c = fgetc(matches);
-										if(c != '#') aux[x] = c;
-										else break;
-									}
-									aux[192] = '\0';
-									x = 0;
-									while(aux[x] != '\0'){
-										if(aux[x] != '@') printf("%c", aux[x]);
-										else printf("\n");
-										x++;
-									}
-									printf("\n");
+								if(strcmp(chav, vetorPrim[j].chave) == 0){
+									r = vetorPrim[j].rrn;
+									break;
 								}
 							}
+								if(r != -1){
+									fseek(matches, r, SEEK_SET);
+									for(x = 0; x < 192; x++) dados[x] = fgetc(matches);
+									x = 0;
+									while(dados[x] != '#'){
+										aux[x] = dados[x];
+										x++;
+									}
+									aux[x] = '\0';
+									
+									//tratamento dos dados para impressao
+									printf("%s\n", strtok(aux, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("%s\n", strtok(NULL, "@"));
+									printf("\n");
+								}
+								fseek(matches, 0L, SEEK_SET);
+							//}
 						}
 					}else printf("Opcao invalida!\n");
 					
@@ -573,20 +608,19 @@ int main(){
 			//Libera memoria
 			case 6:
 				//Verifica quem esta marcado para remocao (*|) e finaliza a op
-				fseek(matches, 0L, SEEK_END);
+				/*fseek(matches, 0L, SEEK_END);
 				tam = ftell(matches);
 				fseek(matches, 0L, SEEK_SET);
 				
 				for(i = 0; i < tam; i += 192){
+					fseek(matches, i, SEEK_SET);
 					for(j = 0; j < 192; j++){
-						str[j] = fgetc(matches);
+						dadosArq[j] = fgetc(matches);
 					}
-					str[192] = '\0';
-					if(str[0] == '*' && str[1] == '|'){
-						//Remocao de fato
-						//...
+					if(dadosArq[0] == '*' && dadosArq[1] == '|'){
+						for(j = 0; j < 192; j++) fputs("", matches);
 					}
-				}
+				}*/
 				
 				break;
 			//Finaliza operacao
@@ -700,9 +734,7 @@ int arqVazio(FILE *f){
 	tam = ftell(f);
 	fseek(f, 0L, SEEK_SET);
 	
-	if(tam == 0) return 1;
-	
-	return 0;
+	return tam;
 }
 
 void carregaVetor(FILE *f, Registro *v){
