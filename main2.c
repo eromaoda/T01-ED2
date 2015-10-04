@@ -33,8 +33,8 @@ int main(){
 	}
 	
 	iprim = fopen("iprimary.idx", "r+");
-	if(matches == NULL){
-		iprim = fopen("iprim.idx", "w+");
+	if(iprim == NULL){
+		iprim = fopen("iprimary.idx", "w+");
 	}
 	
 	iwinner = fopen("iwinner.idx", "r+");
@@ -109,8 +109,10 @@ int main(){
 			for(k = 0; k < strlen(m); k++) vetorMVP[count].mvp[k] = m[k];
 
 			vetorPrim[count].rrn = i;
-			count++;	
+			count++;
 		}
+		fseek(iprim, 0L, SEEK_SET);
+		
 		//Se os indices ja existirem
 		if(getTamanhoArq(iprim) != 0){
 			//Se nao estiverem consistentes com o arquivo de dados
@@ -118,9 +120,10 @@ int main(){
 			
 			}
 		}
+		
 	}else printf("Arquivo de dados vazio!\n");
-	fseek(matches, 0L, SEEK_SET);
-	fclose(matches);
+	fseek(matches, 0L, SEEK_SET);	
+	fclose(matches);	
 	fclose(iprim);
 	fclose(iwinner);
 	fclose(imvp);
@@ -315,8 +318,6 @@ int main(){
 				if(matches == NULL){
 					matches = fopen("matches.dat", "w+");
 				}
-				//char dadosArq[192];
-				//int op2, enc = 0, i;
 				printf("1. Busca por Codigo\n2. Busca por Nome da Equipe Vencedora\n3. Busca por Apelido do MVP\n");
 				scanf("%d", &op2);
 				getchar();
@@ -350,17 +351,7 @@ int main(){
 							}
 							a[x] = '\0';
 							
-							//printDados(a);
-							printf("%s\n", strtok(a, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("%s\n", strtok(NULL, "@"));
-							printf("\n");
+							printDados(a);
 						}
 						}else printf("Registro nao encontrado!\n");
 					fseek(matches, 0L, SEEK_SET);
@@ -396,16 +387,7 @@ int main(){
 												x++;
 											}
 											a[x] = '\0';
-											printf("%s\n", strtok(a, "@"));
-											printf("%s\n", strtok(NULL, "@"));
-											printf("%s\n", strtok(NULL, "@"));
-											printf("%s\n", strtok(NULL, "@"));
-											printf("%s\n", strtok(NULL, "@"));
-											printf("%s\n", strtok(NULL, "@"));
-											printf("%s\n", strtok(NULL, "@"));
-											printf("%s\n", strtok(NULL, "@"));
-											printf("%s\n", strtok(NULL, "@"));
-											printf("\n");
+											printDados(a);
 										}
 									} 
 									vai = 0;
@@ -446,18 +428,10 @@ int main(){
 											x++;
 										}
 										a[x] = '\0';
-										printf("%s\n", strtok(a, "@"));
-										printf("%s\n", strtok(NULL, "@"));
-										printf("%s\n", strtok(NULL, "@"));
-										printf("%s\n", strtok(NULL, "@"));
-										printf("%s\n", strtok(NULL, "@"));
-										printf("%s\n", strtok(NULL, "@"));
-										printf("%s\n", strtok(NULL, "@"));
-										printf("%s\n", strtok(NULL, "@"));
-										printf("%s\n", strtok(NULL, "@"));
-										printf("\n");
+										printDados(a);
 									}
-								} vai = 0;
+								} 
+								vai = 0;
 							}
 						}
 					}
@@ -499,17 +473,7 @@ int main(){
 								}
 								aux[j] = '\0';
 								
-								//tratamento dos dados para impressao
-								printf("%s\n", strtok(aux, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("%s\n", strtok(NULL, "@"));
-								printf("\n");
+								printDados(aux);
 							}
 						}
 						fseek(matches, 0L, SEEK_SET);
@@ -520,7 +484,6 @@ int main(){
 						
 						for(i = 0; i < count; i++) vAux[i] = vetorWinner[i];
 						
-						//qsort(vetorWinner, count + 1, sizeof(char), comp2);
 						ordenaPorVenc(vAux, count);
 						for(i = 0; i < count; i++) printf("nome win = %s\n", vAux[i].winner);
 						printf("\n");
@@ -540,19 +503,9 @@ int main(){
 										x++;
 									}
 									aux[x] = '\0';
-									}}
-									//tratamento dos dados para impressao
-									printf("%s\n", strtok(aux, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("\n");
-								
+									}
+								}
+								printDados(aux);
 							}
 						
 						fseek(matches, 0L, SEEK_SET);
@@ -581,19 +534,7 @@ int main(){
 									aux[x] = '\0';
 								}
 							}
-									//tratamento dos dados para impressao
-									printf("%s\n", strtok(aux, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("%s\n", strtok(NULL, "@"));
-									printf("\n");
-								//}
-							//}
+							printDados(aux);
 						}
 						fseek(matches, 0L, SEEK_SET);
 					}else printf("Opcao invalida!\n");
@@ -670,8 +611,8 @@ int main(){
 			//Finaliza operacao
 			case 7:
 				iprim = fopen("iprimary.idx", "r+");
-				if(matches == NULL){
-					iprim = fopen("iprim.idx", "w+");
+				if(iprim == NULL){
+					iprim = fopen("iprimary.idx", "w+");
 				}
 				
 				iwinner = fopen("iwinner.idx", "r+");
@@ -683,10 +624,10 @@ int main(){
 				if(imvp == NULL){
 					imvp = fopen("imvp.idx", "w+");
 				}
-			
+				
 				//Atualizando os indices no disco
 				fseek(iprim, 0L, SEEK_SET);
-				fputc('1', iprim);
+				fputs("1\n", iprim);
 				for(i = 0; i < count; i++){
 					if(vetorPrim[i].rrn != -1){
 						int t = getTamanhoArq(iprim);
