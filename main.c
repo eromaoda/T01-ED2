@@ -117,7 +117,17 @@ int main(){
 		if(getTamanhoArq(iprim) != 0){
 			//Se nao estiverem consistentes com o arquivo de dados
 			if(fgetc(iprim) == '0'){
-			
+				remove("iprimary.idx");
+				fclose(iprim);
+				iprim = fopen("iprimary.idx", "r+");
+				if(iprim == NULL) iprim = fopen("iprimary.idx", "w+");
+				fputs("1\n", iprim);
+				int i;
+				for(i = 0; i < count; i++){
+					int t = getTamanhoArq(iprim);
+					fseek(iprim, t, SEEK_SET);
+					fprintf(iprim, "%s %d\n", vetorPrim[i].chave, vetorPrim[i].rrn);
+				}
 			}
 		}
 		
