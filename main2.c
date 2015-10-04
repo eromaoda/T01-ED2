@@ -111,9 +111,19 @@ int main(){
 			vetorPrim[count].rrn = i;
 			count++;	
 		}
+		//Se os indices ja existirem
+		if(getTamanhoArq(iprim) != 0){
+			//Se nao estiverem consistentes com o arquivo de dados
+			if(fgetc(iprim) == '0'){
+			
+			}
+		}
 	}else printf("Arquivo de dados vazio!\n");
 	fseek(matches, 0L, SEEK_SET);
 	fclose(matches);
+	fclose(iprim);
+	fclose(iwinner);
+	fclose(imvp);
 	
 	while(1){
 		printMenu();
@@ -325,7 +335,7 @@ int main(){
 					}
 					if(enc == 1){
 						//Se o arquivo de dados nao esta vazio
-						if(getTamanhoArq(matches) == 0){	
+						if(getTamanhoArq(matches) != 0){	
 							fseek(matches, rrnBusca, SEEK_SET);
 							for(j = 0; j < 191; j++){
 								dadosArq[j] = fgetc(matches);
@@ -659,12 +669,56 @@ int main(){
 				break;
 			//Finaliza operacao
 			case 7:
-				//free(vetorPrim);
-				//free(vetorWinner);
-				//free(vetorMVP);
+				iprim = fopen("iprimary.idx", "r+");
+				if(matches == NULL){
+					iprim = fopen("iprim.idx", "w+");
+				}
+				
+				iwinner = fopen("iwinner.idx", "r+");
+				if(iwinner == NULL){
+					iwinner = fopen("iwinner.idx", "w+");
+				}
+				
+				imvp = fopen("imvp.idx", "r+");
+				if(imvp == NULL){
+					imvp = fopen("imvp.idx", "w+");
+				}
+			
+				//Atualizando os indices no disco
+				fseek(iprim, 0L, SEEK_SET);
+				fputc('1', iprim);
+				for(i = 0; i < count; i++){
+					if(vetorPrim[i].rrn != -1){
+						int t = getTamanhoArq(iprim);
+						fseek(iprim, t, SEEK_SET);
+						fprintf(iprim, "%s %d\n", vetorPrim[i].chave, vetorPrim[i].rrn);
+					}
+				}
+				
+				fseek(iwinner, 0L, SEEK_SET);
+				fputc('1', iwinner);
+				for(i = 0; i < count; i++){
+					if(vetorPrim[i].rrn != -1){
+						int t = getTamanhoArq(iwinner);
+						fseek(iwinner, t, SEEK_SET);
+						fprintf(iwinner, "%s %s\n", vetorWinner[i].winner, vetorWinner[i].chave);
+					}
+				}
+				
+				fseek(imvp, 0L, SEEK_SET);
+				fputc('1', imvp);
+				for(i = 0; i < count; i++){
+					if(vetorPrim[i].rrn != -1){
+						int t = getTamanhoArq(imvp);
+						fseek(imvp, t, SEEK_SET);
+						fprintf(imvp, "%s %s\n", vetorMVP[i].mvp, vetorMVP[i].chave);
+					}
+				}
+
 				fclose(iprim);
 				fclose(iwinner);	
 				fclose(imvp);
+				
 				return 0;
 			default:
 				break;
