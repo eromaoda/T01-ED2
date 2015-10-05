@@ -135,45 +135,6 @@ int chaveJaExiste(Registro *v, char *ch, int k){
 	return 0;
 }
 
-void geraIndice(char *rgStr, Registro *v1, Registro *v2, Registro *v3, int k){
-	char aux[192], *ch, *c1, *w, *m;
-	int i = 0;
-	
-	ch = malloc(sizeof(char) * 39 + 1);
-	if(ch == NULL) exit(1);
-	
-	c1 = malloc(sizeof(char) * 39 + 1);
-	if(c1 == NULL) exit(1);
-	
-	w = malloc(sizeof(char) * 39 + 1);
-	if(w == NULL) exit(1);
-	
-	m = malloc(sizeof(char) * 39 + 1);
-	if(m == NULL) exit(1);
-	
-	while(rgStr[i] != '#') aux[i++] = rgStr[i];
-	aux[i] = '\0';
-	
-	ch = strtok(aux, "@");
-	c1 = strtok(NULL, "@");
-	c1 = strtok(NULL, "@");
-	c1 = strtok(NULL, "@");
-	c1 = strtok(NULL, "@");
-	w = strtok(NULL, "@");
-	c1 = strtok(NULL, "@");
-	c1 = strtok(NULL, "@");
-	m = strtok(NULL, "@");
-	
-	strcpy(v1[k].chave, ch);
-	strcpy(v2[k].chave, ch);
-	strcpy(v3[k].chave, ch);
-	
-	free(ch);
-	free(c1);
-	free(w);
-	free(m);
-}
-
 //As funcoes de ordenacao abaixo sao implementacoes do algoritmo de Selection Sort
 void ordenaPorChave(Registro *v, int n){
 	int i,j, min;
@@ -229,4 +190,47 @@ void printDados(char *s){
 	printf("%s\n", strtok(NULL, "@"));
 	printf("%s\n", strtok(NULL, "@"));
 	printf("\n");
+}
+
+void atualizaPrim(Registro *v, FILE *f, int n){
+	int i;
+	fseek(f, 0L, SEEK_SET);
+	fputs("1\n", f);
+	for(i = 0; i < n; i++){
+		if(v[i].rrn != -1){
+			int t = getTamanhoArq(f);
+			fseek(f, t, SEEK_SET);
+			fprintf(f, "%s %d\n", v[i].chave, v[i].rrn);
+		}
+	}
+}
+
+void atualizaWinner(Registro *v, FILE *f, int n){
+	int i;
+	fseek(f, 0L, SEEK_SET);
+	fputs("1\n", f);
+	for(i = 0; i < n; i++){
+		if(v[i].rrn != -1){
+			int t = getTamanhoArq(f);	
+			fseek(f, t, SEEK_SET);
+			fprintf(f, "%s %s\n", v[i].winner, v[i].chave);
+		}
+	}
+}
+
+void atualizaMVP(Registro *v, FILE *f, int n){
+	int i;
+	fseek(f, 0L, SEEK_SET);
+	fputs("1\n", f);
+	for(i = 0; i < n; i++){
+		if(v[i].rrn != -1){
+			int t = getTamanhoArq(f);
+			char temp[39];
+			strcpy(temp, v[i].mvp);
+			v[i].chave[8] = '\0';
+			strcpy(v[i].mvp, temp);
+			fseek(f, t, SEEK_SET);
+			fprintf(f, "%s %s\n", v[i].mvp, v[i].chave);
+		}
+	}
 }

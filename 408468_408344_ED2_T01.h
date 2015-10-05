@@ -50,8 +50,12 @@ void carregaVetor(FILE *f, Registro *v);
 void criaIndicePrim(FILE *f, Registro *v);
 //Verifica se a chave ja foi inserida no arquivo de dados
 int chaveJaExiste(Registro *v, char *ch, int k);
-void geraIndice(char *rgStr, Registro *v1, Registro *v2, Registro *v3, int k);
-void atualizaDados(Registro *v, FILE *f);
+//Atualiza o indice primario
+void atualizaPrim(Registro *v, FILE *f, int n);
+//Atualiza o indice dos times vencedores
+void atualizaWinner(Registro *v, FILE *f, int n);
+//Atualiza o indice dos apelidos dos MVP's
+void atualizaMVP(Registro *v, FILE *f, int n);
 //Ordenacoes utilizando o algoritmo de Selection Sort
 void ordenaPorChave(Registro *v, int n);
 void ordenaPorVenc(Registro *v, int n);

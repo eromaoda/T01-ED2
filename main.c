@@ -126,7 +126,7 @@ int main(){
 				for(i = 0; i < count; i++){
 					int t = getTamanhoArq(iprim);
 					fseek(iprim, t, SEEK_SET);
-					fprintf(iprim, "%s %d\n", vetorPrim[i].chave, vetorPrim[i].rrn);
+					fprintf(iprim, "%s %d lol\n", vetorPrim[i].chave, vetorPrim[i].rrn);
 				}
 			}
 		}
@@ -620,6 +620,10 @@ int main(){
 				break;
 			//Finaliza operacao
 			case 7:
+				remove("iprimary.idx");
+				remove("iwinner.idx");
+				remove("imvp.idx");
+				
 				iprim = fopen("iprimary.idx", "r+");
 				if(iprim == NULL){
 					iprim = fopen("iprimary.idx", "w+");
@@ -636,35 +640,9 @@ int main(){
 				}
 				
 				//Atualizando os indices no disco
-				fseek(iprim, 0L, SEEK_SET);
-				fputs("1\n", iprim);
-				for(i = 0; i < count; i++){
-					if(vetorPrim[i].rrn != -1){
-						int t = getTamanhoArq(iprim);
-						fseek(iprim, t, SEEK_SET);
-						fprintf(iprim, "%s %d\n", vetorPrim[i].chave, vetorPrim[i].rrn);
-					}
-				}
-				
-				fseek(iwinner, 0L, SEEK_SET);
-				fputc('1', iwinner);
-				for(i = 0; i < count; i++){
-					if(vetorPrim[i].rrn != -1){
-						int t = getTamanhoArq(iwinner);
-						fseek(iwinner, t, SEEK_SET);
-						fprintf(iwinner, "%s %s\n", vetorWinner[i].winner, vetorWinner[i].chave);
-					}
-				}
-				
-				fseek(imvp, 0L, SEEK_SET);
-				fputc('1', imvp);
-				for(i = 0; i < count; i++){
-					if(vetorPrim[i].rrn != -1){
-						int t = getTamanhoArq(imvp);
-						fseek(imvp, t, SEEK_SET);
-						fprintf(imvp, "%s %s\n", vetorMVP[i].mvp, vetorMVP[i].chave);
-					}
-				}
+				atualizaPrim(vetorPrim, iprim, count);
+				atualizaWinner(vetorWinner, iwinner, count);
+				atualizaMVP(vetorMVP, imvp, count);
 
 				fclose(iprim);
 				fclose(iwinner);	
